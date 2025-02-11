@@ -27,3 +27,13 @@ class CurrentUser {
   @HiveField(5)
   List<String> roles;
 }
+
+@HiveType(typeId: 2)
+class AllUsers {
+  AllUsers({
+    required this.allUsers,
+  });
+
+  @HiveField(5)
+  List<String> allUsers;
+}

@@ -171,3 +171,156 @@ class _BodyState extends State<_Body> {
     );
   }
 }
+
+class AddUserBottomSheet extends StatelessWidget {
+  const AddUserBottomSheet({super.key});
+
+  static Future<String?> show(
+    BuildContext parentContext,
+  ) async {
+    return showModalBottomSheet<String>(
+      backgroundColor: Theme.of(parentContext).colorScheme.background,
+      context: parentContext,
+      useSafeArea: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.r),
+          topRight: Radius.circular(20.r),
+        ),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return BlocProvider(
+          create: (context) => BottomSheetDataBloc(
+            initialValue: '',
+            initialList: [],
+          ),
+          child: AddUserBottomSheet(),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
+      builder: (context, state) {
+        return DefaultBottomSheet(
+          title: 'Add new user',
+          heightRatio: 0.4,
+          isActionEnabled: state.isButtonEnabled,
+          actionText: 'Select',
+          action: () {
+            if (state.isButtonEnabled) {
+              Navigator.pop(context, state.selectedValue);
+            }
+          },
+          child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
+            builder: (context, state) {
+              if (state.blocProgress == BlocProgress.IS_LOADING) {
+                return const PrimaryBottomSheetLoader();
+              }
+
+              return AddUserBody();
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class AddUserBody extends StatefulWidget {
+  const AddUserBody({super.key});
+
+  @override
+  State<AddUserBody> createState() => AddUserBodyState();
+}
+
+class AddUserBodyState extends State<AddUserBody> {
+  final controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            children: [
+              Divider(
+                color: Theme.of(context).colorScheme.inversePrimary,
+                height: 1.h,
+                thickness: 1.h,
+              ),
+              SizedBox(height: 20),
+
+              SignInUsernameField(usernameController: controller),
+              Spacer(),
+              ActionButton(
+                  text: 'Add',
+                  onPressed: () {
+                    Navigator.pop(context, controller.text);
+                  }),
+
+              // INFO: Always needed for Scrollable Bottom sheets
+              SizedBox(height: 40.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SignInUsernameField extends StatelessWidget {
+  final TextEditingController usernameController;
+
+  const SignInUsernameField({
+    super.key,
+    required this.usernameController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48.h,
+      child: TextFormField(
+        controller: usernameController,
+        textInputAction: TextInputAction.next,
+        onChanged: (value) {
+          // context
+          //     .read<AuthBloc>()
+          //     .updateData(login: usernameController.text.trim());
+        },
+        decoration: InputDecoration(
+          filled: true,
+          errorStyle: TextStyle(height: 0.1, fontSize: 12.sp),
+          border: InputBorder.none,
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: NewColorsDark.borderMuted.withOpacity(0.15), width: 1.w),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.primary, width: 1.w),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.inputField, width: 1.w),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.inputField, width: 1.w),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          fillColor: Theme.of(context).colorScheme.onBackground,
+          hintText: 'First name',
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.tertiaryFixed,
+          ),
+        ),
+      ),
+    );
+  }
+}

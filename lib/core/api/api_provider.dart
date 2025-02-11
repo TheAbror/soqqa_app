@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:chopper/chopper.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http/io_client.dart' as http;
 import 'package:soqqa_app/widget_imports.dart';
 

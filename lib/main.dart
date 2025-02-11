@@ -8,8 +8,10 @@ void main() async {
   await Hive.initFlutter();
 
   Hive.registerAdapter(CurrentUserAdapter());
+  Hive.registerAdapter(AllUsersAdapter());
 
   boxCurrentUser = await Hive.openBox<CurrentUser>(ShPrefKeys.currentUser);
+  boxAllUsers = await Hive.openBox<AllUsers>(ShPrefKeys.allUsers);
 
   ApiProvider.create();
 
@@ -20,7 +22,7 @@ void main() async {
       runApp(
         MultiBlocProvider(
           providers: [
-            // BlocProvider(create: (context) =>AuthBloc()),
+            BlocProvider(create: (context) => RootBloc()),
           ],
           child: const MyApp(),
         ),

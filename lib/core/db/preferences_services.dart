@@ -19,10 +19,10 @@ class PreferencesServices {
   static void dispose() => _prefs = null;
 
   static String? getFirebaseToken() {
-    return _getPrefs().getString(ShPrefKeys.firebaseToken);
+    return _getPrefs().getString(ShPrefKeys.currentUser);
   }
 
   static Future<bool> saveFirebaseToken(String langCode) async {
-    return _getPrefs().setString(ShPrefKeys.firebaseToken, langCode);
+    return _getPrefs().setString(ShPrefKeys.currentUser, langCode);
   }
 }

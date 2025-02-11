@@ -1,4 +1,3 @@
-import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:soqqa_app/widget_imports.dart';
 
 class SearchSettings extends StatelessWidget {
