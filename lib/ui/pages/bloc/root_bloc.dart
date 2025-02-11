@@ -9,12 +9,33 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(tabIndex: tabIndex));
   }
 
-  // AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
+  void getDB() {
+    AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
+
+    var db = List<String>.from(state.allUsers);
+
+    db = savedUsers!.allUsers;
+
+    emit(state.copyWith(allUsers: db));
+  }
 
   void addUser(String user) {
     final users = List<String>.from(state.allUsers);
 
     users.add(user);
+
+    emit(state.copyWith(allUsers: users));
+
+    boxAllUsers.put(
+      ShPrefKeys.allUsers,
+      AllUsers(allUsers: users),
+    );
+  }
+
+  void removeUser(int index) {
+    final users = List<String>.from(state.allUsers);
+
+    users.removeAt(index);
 
     emit(state.copyWith(allUsers: users));
 

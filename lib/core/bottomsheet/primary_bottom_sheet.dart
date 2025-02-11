@@ -145,26 +145,79 @@ class _BodyState extends State<_Body> {
                   }
 
                   return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: state.searchedList.length,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: state.initialList.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return BottomSheetListSingleChoiceItem<String>(
-                        itemTitle: state.searchedList[index].toString(),
-                        value: state.searchedList[index].toString(),
-                        groupValue: state.selectedValue.toString(),
-                        onChanged: (value) {
-                          context.read<BottomSheetDataBloc>().choose(value);
-                          Navigator.pop(context, value);
+                      final item = state.initialList[index];
+                      // final student = item.studentInfo;
+                      // final isSelected = state.selectedStudentIDS
+                      //     .contains(item.studentInfo.id);
+                      // final isAttended = state.attendedStudentIDS
+                      //     .contains(item.studentInfo.id);
+
+                      final isSelected = false;
+
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          // context
+                          //     .read<StaffBottomSheetAttendanceBloc>()
+                          //     .choose(student.id);
                         },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 4.h),
+                          padding: EdgeInsets.symmetric(vertical: 4.h),
+                          decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryFixedVariant
+                                      .withOpacity(0.1)
+                                  : Theme.of(context).colorScheme.onBackground,
+                              borderRadius: BorderRadius.circular(8.r)),
+                          child: Row(
+                            children: [
+                              CustomCheckbox(
+                                isAttended: true,
+                                onChanged: () {
+                                  // context
+                                  //     .read<StaffBottomSheetAttendanceBloc>()
+                                  //     .choose(student.id);
+                                },
+                              ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                item,
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   );
                 },
               ),
             ),
+            ActionButton(
+              text: 'Add new user',
+              onPressed: () async {
+                final result = await AddUserBottomSheet.show(context);
+
+                debugPrint(result);
+
+                if (result != null && result.isNotEmpty) {
+                  if (!context.mounted) return;
+                  context.read<RootBloc>().addUser(result);
+                }
+              },
+            ),
             // INFO: Always needed for Scrollable Bottom sheets
-            SizedBox(height: 24.h),
+            SizedBox(height: 40.h),
           ],
         );
       },
@@ -319,6 +372,58 @@ class SignInUsernameField extends StatelessWidget {
           hintStyle: TextStyle(
             color: Theme.of(context).colorScheme.tertiaryFixed,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomCheckbox extends StatelessWidget {
+  final bool isAttended;
+  final VoidCallback onChanged;
+  final bool isNeutral;
+
+  const CustomCheckbox({
+    super.key,
+    required this.isAttended,
+    required this.onChanged,
+    this.isNeutral = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onChanged,
+      child: Container(
+        margin: EdgeInsets.only(left: 8.w),
+        padding: EdgeInsets.all(1.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: isAttended ? AppColors.primary : Colors.transparent,
+          border: Border.all(
+            color: isNeutral
+                ? Colors.transparent
+                : isAttended
+                    ? AppColors.primary
+                    : Theme.of(context)
+                        .colorScheme
+                        .tertiaryFixedDim
+                        .withOpacity(0.25),
+            width: isNeutral ? 0 : 2,
+          ),
+        ),
+        child: Center(
+          child: isNeutral
+              ? Icon(
+                  Icons.remove,
+                  color: isAttended ? AppColors.float : Colors.red,
+                  size: 18.sp,
+                )
+              : Icon(
+                  isAttended ? Icons.check : Icons.close, // ✅ or ❌
+                  color: isAttended ? AppColors.float : Colors.red,
+                  size: 16.sp,
+                ),
         ),
       ),
     );

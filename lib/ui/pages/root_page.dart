@@ -15,30 +15,33 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RootBloc, RootState>(
-      builder: (context, state) {
-        return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          body: SafeArea(child: pages[state.tabIndex]),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.business),
-                label: 'Settings',
-              ),
-            ],
-            currentIndex: state.tabIndex,
-            selectedItemColor: Colors.amber[800],
-            onTap: (value) {
-              context.read<RootBloc>().selectTabIndex(value);
-            },
-          ),
-        );
-      },
+    return BlocProvider(
+      create: (context) => RootBloc()..getDB(),
+      child: BlocBuilder<RootBloc, RootState>(
+        builder: (context, state) {
+          return Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.background,
+            body: SafeArea(child: pages[state.tabIndex]),
+            bottomNavigationBar: BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.business),
+                  label: 'Settings',
+                ),
+              ],
+              currentIndex: state.tabIndex,
+              selectedItemColor: Colors.amber[800],
+              onTap: (value) {
+                context.read<RootBloc>().selectTabIndex(value);
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -66,17 +69,35 @@ class _HomeTabState extends State<HomeTab> {
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(state.allUsers[index]),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          //
+                          context.read<RootBloc>().removeUser(index);
+                        },
+                        child: Icon(
+                          IconsaxPlusLinear.user_remove,
+                          color: AppColors.primary,
+                        ),
+                      ),
                       textColor: Theme.of(context).colorScheme.tertiary,
                     );
                   },
                 ),
               ),
               ActionButton(
-                text: 'Add new user',
+                text: 'Select users',
                 onPressed: () async {
-                  final result = await AddUserBottomSheet.show(context);
+                  final result = await PrimaryBottomSheet.show(
+                    context,
+                    title: '',
+                    isConfirmationNeeded: false,
+                    isSearchNeeded: true,
+                    heightRatio: 0.8,
+                    selectedValue: '',
+                    initialList: state.allUsers,
+                  );
 
-                  print(result);
+                  debugPrint(result);
 
                   if (result != null && result.isNotEmpty) {
                     if (!context.mounted) return;
