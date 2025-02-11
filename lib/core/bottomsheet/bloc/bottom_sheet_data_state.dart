@@ -3,7 +3,7 @@ part of 'bottom_sheet_data_bloc.dart';
 class BottomSheetDataState extends Equatable {
   final String selectedValue;
   final List<String> initialList;
-  final List<String> searchedList;
+  final List<String> selectedUsers;
   final bool isButtonEnabled;
   final BlocProgress blocProgress;
   final String failureMessage;
@@ -11,7 +11,7 @@ class BottomSheetDataState extends Equatable {
   const BottomSheetDataState({
     required this.selectedValue,
     required this.initialList,
-    required this.searchedList,
+    required this.selectedUsers,
     required this.isButtonEnabled,
     required this.blocProgress,
     required this.failureMessage,
@@ -24,7 +24,7 @@ class BottomSheetDataState extends Equatable {
     return BottomSheetDataState(
       selectedValue: initialValue,
       initialList: initialList,
-      searchedList: initialList,
+      selectedUsers: [],
       isButtonEnabled: false,
       blocProgress: BlocProgress.NOT_STARTED,
       failureMessage: '',
@@ -34,7 +34,7 @@ class BottomSheetDataState extends Equatable {
   BottomSheetDataState copyWith({
     String? selectedValue,
     List<String>? initialList,
-    List<String>? searchedList,
+    List<String>? selectedUsers,
     bool? isButtonEnabled,
     BlocProgress? blocProgress,
     String? failureMessage,
@@ -42,7 +42,7 @@ class BottomSheetDataState extends Equatable {
     return BottomSheetDataState(
       selectedValue: selectedValue ?? this.selectedValue,
       initialList: initialList ?? this.initialList,
-      searchedList: searchedList ?? this.searchedList,
+      selectedUsers: selectedUsers ?? this.selectedUsers,
       isButtonEnabled: isButtonEnabled ?? this.isButtonEnabled,
       blocProgress: blocProgress ?? this.blocProgress,
       failureMessage: failureMessage ?? this.failureMessage,
@@ -53,7 +53,7 @@ class BottomSheetDataState extends Equatable {
   List<Object?> get props => [
         selectedValue,
         initialList,
-        searchedList,
+        selectedUsers,
         isButtonEnabled,
         blocProgress,
         failureMessage,

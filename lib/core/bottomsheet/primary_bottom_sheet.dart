@@ -2,28 +2,22 @@ import 'package:soqqa_app/widget_imports.dart';
 
 class PrimaryBottomSheet extends StatelessWidget {
   final String title;
-  final bool isSearchNeeded;
-  final bool? isConfirmationNeeded;
   final double heightRatio;
 
   const PrimaryBottomSheet({
     super.key,
     required this.title,
-    required this.isSearchNeeded,
     required this.heightRatio,
-    required this.isConfirmationNeeded,
   });
 
-  static Future<String?> show(
+  static Future<List<String>?> show(
     BuildContext parentContext, {
     required String title,
-    required bool isConfirmationNeeded,
-    required bool isSearchNeeded,
     required double heightRatio,
     required String selectedValue,
     required List<String> initialList,
   }) async {
-    return showModalBottomSheet<String>(
+    return showModalBottomSheet<List<String>>(
       backgroundColor: Theme.of(parentContext).colorScheme.background,
       context: parentContext,
       useSafeArea: true,
@@ -42,8 +36,6 @@ class PrimaryBottomSheet extends StatelessWidget {
           ),
           child: PrimaryBottomSheet(
             title: title,
-            isSearchNeeded: isSearchNeeded,
-            isConfirmationNeeded: isConfirmationNeeded,
             heightRatio: heightRatio,
           ),
         );
@@ -58,12 +50,11 @@ class PrimaryBottomSheet extends StatelessWidget {
         return DefaultBottomSheet(
           title: title,
           heightRatio: heightRatio,
-          isActionEnabled: state.isButtonEnabled,
-          actionText: 'Select',
+          isActionEnabled: true,
+          actionText: 'Save',
+          isActionAvailable: true,
           action: () {
-            if (state.isButtonEnabled) {
-              Navigator.pop(context, state.selectedValue);
-            }
+            Navigator.pop(context, state.selectedUsers);
           },
           child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
             builder: (context, state) {
@@ -71,7 +62,7 @@ class PrimaryBottomSheet extends StatelessWidget {
                 return const PrimaryBottomSheetLoader();
               }
 
-              return _Body(isSearchNeeded: isSearchNeeded);
+              return _Body();
             },
           ),
         );
@@ -81,19 +72,11 @@ class PrimaryBottomSheet extends StatelessWidget {
 }
 
 class _Body extends StatefulWidget {
-  final bool isSearchNeeded;
-
-  const _Body({
-    required this.isSearchNeeded,
-  });
-
   @override
   State<_Body> createState() => _BodyState();
 }
 
 class _BodyState extends State<_Body> {
-  final searchController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
@@ -106,84 +89,43 @@ class _BodyState extends State<_Body> {
               thickness: 1.h,
             ),
 
-            if (widget.isSearchNeeded == true)
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-                child: SearchInput(
-                  fillColor: Theme.of(context).colorScheme.surfaceTint,
-                  width: double.infinity,
-                  hintText: 'Search',
-                  prefixIcon:
-                      const Icon(Icons.search, color: AppColors.primary),
-                  controller: searchController,
-                  onChanged: (val) {
-                    context.read<BottomSheetDataBloc>().search(val);
-                  },
-                ),
-              ),
-
             Expanded(
               child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
                 builder: (context, state) {
                   if (state.blocProgress == BlocProgress.IS_LOADING) {
                     return const PrimaryLoader();
-                  } else if (state.searchedList.isEmpty) {
-                    return Padding(
-                      padding: EdgeInsets.only(top: 24.h),
-                      child: Text(
-                        'No results',
-                      ),
-                    );
-                  } else if (state.searchedList.length == 1 &&
-                      state.searchedList.first.isEmpty) {
-                    return Padding(
-                      padding: EdgeInsets.only(top: 24.h),
-                      child: Text(
-                        'No results',
-                      ),
-                    );
                   }
-
                   return ListView.builder(
                     shrinkWrap: true,
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 8.w,
+                    ),
                     physics: const BouncingScrollPhysics(),
                     itemCount: state.initialList.length,
                     itemBuilder: (BuildContext context, int index) {
                       final item = state.initialList[index];
-                      // final student = item.studentInfo;
-                      // final isSelected = state.selectedStudentIDS
-                      //     .contains(item.studentInfo.id);
-                      // final isAttended = state.attendedStudentIDS
-                      //     .contains(item.studentInfo.id);
 
-                      final isSelected = false;
+                      final isSelected = state.selectedUsers.contains(item);
 
                       return GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () {
-                          // context
-                          //     .read<StaffBottomSheetAttendanceBloc>()
-                          //     .choose(student.id);
+                          context
+                              .read<BottomSheetDataBloc>()
+                              .selectUsersToStartCalculations(item);
                         },
                         child: Container(
                           margin: EdgeInsets.only(bottom: 4.h),
                           padding: EdgeInsets.symmetric(vertical: 4.h),
-                          decoration: BoxDecoration(
-                              color: isSelected
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryFixedVariant
-                                      .withOpacity(0.1)
-                                  : Theme.of(context).colorScheme.onBackground,
-                              borderRadius: BorderRadius.circular(8.r)),
                           child: Row(
                             children: [
                               CustomCheckbox(
-                                isAttended: true,
+                                isAttended: isSelected,
                                 onChanged: () {
-                                  // context
-                                  //     .read<StaffBottomSheetAttendanceBloc>()
-                                  //     .choose(student.id);
+                                  context
+                                      .read<BottomSheetDataBloc>()
+                                      .selectUsersToStartCalculations(item);
                                 },
                               ),
                               SizedBox(width: 8.w),
@@ -203,229 +145,30 @@ class _BodyState extends State<_Body> {
                 },
               ),
             ),
-            ActionButton(
-              text: 'Add new user',
-              onPressed: () async {
-                final result = await AddUserBottomSheet.show(context);
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.w,
+                vertical: 12.h,
+              ),
+              child: ActionButton(
+                text: 'Add new user',
+                onPressed: () async {
+                  final result = await AddUserBottomSheet.show(context);
 
-                debugPrint(result);
+                  debugPrint(result);
 
-                if (result != null && result.isNotEmpty) {
-                  if (!context.mounted) return;
-                  context.read<RootBloc>().addUser(result);
-                }
-              },
+                  if (result != null && result.isNotEmpty) {
+                    if (!context.mounted) return;
+                    context.read<RootBloc>().addUser(result);
+                  }
+                },
+              ),
             ),
             // INFO: Always needed for Scrollable Bottom sheets
             SizedBox(height: 40.h),
           ],
         );
       },
-    );
-  }
-}
-
-class AddUserBottomSheet extends StatelessWidget {
-  const AddUserBottomSheet({super.key});
-
-  static Future<String?> show(
-    BuildContext parentContext,
-  ) async {
-    return showModalBottomSheet<String>(
-      backgroundColor: Theme.of(parentContext).colorScheme.background,
-      context: parentContext,
-      useSafeArea: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
-        ),
-      ),
-      isScrollControlled: true,
-      builder: (context) {
-        return BlocProvider(
-          create: (context) => BottomSheetDataBloc(
-            initialValue: '',
-            initialList: [],
-          ),
-          child: AddUserBottomSheet(),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-      builder: (context, state) {
-        return DefaultBottomSheet(
-          title: 'Add new user',
-          heightRatio: 0.4,
-          isActionEnabled: state.isButtonEnabled,
-          actionText: 'Select',
-          action: () {
-            if (state.isButtonEnabled) {
-              Navigator.pop(context, state.selectedValue);
-            }
-          },
-          child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-            builder: (context, state) {
-              if (state.blocProgress == BlocProgress.IS_LOADING) {
-                return const PrimaryBottomSheetLoader();
-              }
-
-              return AddUserBody();
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-class AddUserBody extends StatefulWidget {
-  const AddUserBody({super.key});
-
-  @override
-  State<AddUserBody> createState() => AddUserBodyState();
-}
-
-class AddUserBodyState extends State<AddUserBody> {
-  final controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-      builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            children: [
-              Divider(
-                color: Theme.of(context).colorScheme.inversePrimary,
-                height: 1.h,
-                thickness: 1.h,
-              ),
-              SizedBox(height: 20),
-
-              SignInUsernameField(usernameController: controller),
-              Spacer(),
-              ActionButton(
-                  text: 'Add',
-                  onPressed: () {
-                    Navigator.pop(context, controller.text);
-                  }),
-
-              // INFO: Always needed for Scrollable Bottom sheets
-              SizedBox(height: 40.h),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class SignInUsernameField extends StatelessWidget {
-  final TextEditingController usernameController;
-
-  const SignInUsernameField({
-    super.key,
-    required this.usernameController,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48.h,
-      child: TextFormField(
-        controller: usernameController,
-        textInputAction: TextInputAction.next,
-        onChanged: (value) {
-          // context
-          //     .read<AuthBloc>()
-          //     .updateData(login: usernameController.text.trim());
-        },
-        decoration: InputDecoration(
-          filled: true,
-          errorStyle: TextStyle(height: 0.1, fontSize: 12.sp),
-          border: InputBorder.none,
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: NewColorsDark.borderMuted.withOpacity(0.15), width: 1.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.primary, width: 1.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.inputField, width: 1.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.inputField, width: 1.w),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          fillColor: Theme.of(context).colorScheme.onBackground,
-          hintText: 'First name',
-          hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.tertiaryFixed,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomCheckbox extends StatelessWidget {
-  final bool isAttended;
-  final VoidCallback onChanged;
-  final bool isNeutral;
-
-  const CustomCheckbox({
-    super.key,
-    required this.isAttended,
-    required this.onChanged,
-    this.isNeutral = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onChanged,
-      child: Container(
-        margin: EdgeInsets.only(left: 8.w),
-        padding: EdgeInsets.all(1.w),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          color: isAttended ? AppColors.primary : Colors.transparent,
-          border: Border.all(
-            color: isNeutral
-                ? Colors.transparent
-                : isAttended
-                    ? AppColors.primary
-                    : Theme.of(context)
-                        .colorScheme
-                        .tertiaryFixedDim
-                        .withOpacity(0.25),
-            width: isNeutral ? 0 : 2,
-          ),
-        ),
-        child: Center(
-          child: isNeutral
-              ? Icon(
-                  Icons.remove,
-                  color: isAttended ? AppColors.float : Colors.red,
-                  size: 18.sp,
-                )
-              : Icon(
-                  isAttended ? Icons.check : Icons.close, // ✅ or ❌
-                  color: isAttended ? AppColors.float : Colors.red,
-                  size: 16.sp,
-                ),
-        ),
-      ),
     );
   }
 }

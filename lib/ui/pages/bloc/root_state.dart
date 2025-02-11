@@ -3,12 +3,14 @@ part of 'root_bloc.dart';
 class RootState extends Equatable {
   final int tabIndex;
   final List<String> allUsers;
+  final List<String> selectedUsers;
   final BlocProgress blocProgress;
   final String failureMessage;
 
   const RootState({
     required this.tabIndex,
     required this.allUsers,
+    required this.selectedUsers,
     required this.blocProgress,
     required this.failureMessage,
   });
@@ -17,6 +19,7 @@ class RootState extends Equatable {
     return RootState(
       tabIndex: 0,
       allUsers: [],
+      selectedUsers: [],
       blocProgress: BlocProgress.NOT_STARTED,
       failureMessage: '',
     );
@@ -25,12 +28,14 @@ class RootState extends Equatable {
   RootState copyWith({
     int? tabIndex,
     List<String>? allUsers,
+    List<String>? selectedUsers,
     BlocProgress? blocProgress,
-    AccountType? accountType,
+    String? failureMessage,
   }) {
     return RootState(
       tabIndex: tabIndex ?? this.tabIndex,
       allUsers: allUsers ?? this.allUsers,
+      selectedUsers: selectedUsers ?? this.selectedUsers,
       blocProgress: blocProgress ?? this.blocProgress,
       failureMessage: '',
     );
@@ -40,6 +45,7 @@ class RootState extends Equatable {
   List<Object?> get props => [
         tabIndex,
         allUsers,
+        selectedUsers,
         blocProgress,
         failureMessage,
       ];

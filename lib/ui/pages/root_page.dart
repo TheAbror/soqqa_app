@@ -1,3 +1,4 @@
+import 'package:soqqa_app/core/constants/text_named_const_widget.dart';
 import 'package:soqqa_app/widget_imports.dart';
 
 class RootPage extends StatefulWidget {
@@ -54,59 +55,98 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
+  final fullAmount = TextEditingController();
+  final discountAmount = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: BlocBuilder<RootBloc, RootState>(
         builder: (context, state) {
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: state.allUsers.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(state.allUsers[index]),
-                      trailing: GestureDetector(
-                        onTap: () {
-                          //
-                          context.read<RootBloc>().removeUser(index);
-                        },
-                        child: Icon(
-                          IconsaxPlusLinear.user_remove,
-                          color: AppColors.primary,
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 10.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText.title3('Full amount', AppColors.float),
+                    SizedBox(
+                      height: 40,
+                      width: 60,
+                      child: TextField(controller: fullAmount),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText.title3('Discount rate amount', AppColors.float),
+                    SizedBox(
+                      height: 40,
+                      width: 60,
+                      child: TextField(controller: discountAmount),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.selectedUsers.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(state.selectedUsers[index]),
+                        trailing: SizedBox(
+                          height: 40,
+                          width: 60,
+                          child: TextField(controller: fullAmount),
                         ),
-                      ),
-                      textColor: Theme.of(context).colorScheme.tertiary,
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     context.read<RootBloc>().removeUser(index);
+                        //   },
+                        //   child: Icon(
+                        //     IconsaxPlusLinear.user_remove,
+                        //     color: AppColors.primary,
+                        //   ),
+                        // ),
+                        textColor: Theme.of(context).colorScheme.tertiary,
+                      );
+                    },
+                  ),
+                ),
+                ActionButton(
+                  isFilled: false,
+                  text: 'Add more users',
+                  onPressed: () async {
+                    final result = await PrimaryBottomSheet.show(
+                      context,
+                      title: 'Add more users',
+                      heightRatio: 0.8,
+                      selectedValue: '',
+                      initialList: state.allUsers,
                     );
+
+                    if (result != null && result.isNotEmpty) {
+                      if (!context.mounted) return;
+                      context.read<RootBloc>().addMultipleUsers(result);
+                    }
                   },
                 ),
-              ),
-              ActionButton(
-                text: 'Select users',
-                onPressed: () async {
-                  final result = await PrimaryBottomSheet.show(
-                    context,
-                    title: '',
-                    isConfirmationNeeded: false,
-                    isSearchNeeded: true,
-                    heightRatio: 0.8,
-                    selectedValue: '',
-                    initialList: state.allUsers,
-                  );
-
-                  debugPrint(result);
-
-                  if (result != null && result.isNotEmpty) {
-                    if (!context.mounted) return;
-                    context.read<RootBloc>().addUser(result);
-                  }
-                },
-              ),
-              SizedBox(height: 40),
-            ],
+                SizedBox(height: 20),
+                ActionButton(
+                  text: 'Calculate',
+                  onPressed: () {},
+                ),
+                SizedBox(height: 40),
+              ],
+            ),
           );
         },
       ),

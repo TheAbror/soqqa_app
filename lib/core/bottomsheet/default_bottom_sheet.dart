@@ -88,28 +88,27 @@ class DefaultBottomSheet extends StatelessWidget {
                                   ),
                                 )
                               : const SizedBox(),
-                          if (isConfirmationNeeded == true)
-                            isActionAvailable
-                                ? GestureDetector(
-                                    onTap: isActionEnabled ? action : null,
-                                    behavior: HitTestBehavior.opaque,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 8.h, bottom: 8.h, left: 8.h),
-                                      child: Text(
-                                        actionText,
-                                        style: TextStyle(
-                                          fontSize: 15.sp,
-                                          color: isActionEnabled
-                                              ? AppColors.primary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary,
-                                        ),
+                          isActionAvailable
+                              ? GestureDetector(
+                                  onTap: isActionEnabled ? action : null,
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 8.h, bottom: 8.h, left: 8.h),
+                                    child: Text(
+                                      actionText,
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: isActionEnabled
+                                            ? AppColors.primary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
                                       ),
                                     ),
-                                  )
-                                : SizedBox(width: 25.w)
+                                  ),
+                                )
+                              : SizedBox(width: 25.w)
                         ],
                       ),
                     ],

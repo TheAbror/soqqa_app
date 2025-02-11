@@ -14,18 +14,13 @@ class BottomSheetDataBloc extends Cubit<BottomSheetDataState> {
           initialList: initialList,
         ));
 
-  void search(String value) {
-    final searchedList = state.initialList
-        .where((element) => element.toLowerCase().contains(value.toLowerCase()))
-        .toList();
+  void selectUsersToStartCalculations(String user) {
+    final list = List<String>.from(state.selectedUsers);
 
-    emit(state.copyWith(searchedList: searchedList));
-  }
+    if (!state.selectedUsers.contains(user)) {
+      list.add(user);
+    }
 
-  void choose(String? value) {
-    final selectedValue =
-        state.searchedList.where((element) => element == value).first;
-
-    emit(state.copyWith(selectedValue: selectedValue, isButtonEnabled: true));
+    emit(state.copyWith(selectedUsers: list));
   }
 }
