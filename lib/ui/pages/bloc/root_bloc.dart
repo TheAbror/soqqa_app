@@ -5,10 +5,6 @@ part 'root_state.dart';
 class RootBloc extends Cubit<RootState> {
   RootBloc() : super(RootState.initial());
 
-  void selectTabIndex(int tabIndex) {
-    emit(state.copyWith(tabIndex: tabIndex));
-  }
-
   void getDB() {
     AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
 

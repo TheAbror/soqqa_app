@@ -14,7 +14,7 @@ class PrimaryBottomSheet extends StatelessWidget {
     BuildContext parentContext, {
     required String title,
     required double heightRatio,
-    required String selectedValue,
+    required List<String> selectedValues,
     required List<String> initialList,
   }) async {
     return showModalBottomSheet<List<String>>(
@@ -31,8 +31,8 @@ class PrimaryBottomSheet extends StatelessWidget {
       builder: (context) {
         return BlocProvider(
           create: (context) => BottomSheetDataBloc(
-            initialValue: selectedValue,
             initialList: initialList,
+            selectedValues: selectedValues,
           ),
           child: PrimaryBottomSheet(
             title: title,
@@ -56,15 +56,7 @@ class PrimaryBottomSheet extends StatelessWidget {
           action: () {
             Navigator.pop(context, state.selectedUsers);
           },
-          child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-            builder: (context, state) {
-              if (state.blocProgress == BlocProgress.IS_LOADING) {
-                return const PrimaryBottomSheetLoader();
-              }
-
-              return _Body();
-            },
-          ),
+          child: _Body(),
         );
       },
     );
@@ -90,57 +82,50 @@ class _BodyState extends State<_Body> {
             ),
 
             Expanded(
-              child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-                builder: (context, state) {
-                  if (state.blocProgress == BlocProgress.IS_LOADING) {
-                    return const PrimaryLoader();
-                  }
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10.h,
-                      horizontal: 8.w,
-                    ),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: state.initialList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final item = state.initialList[index];
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.symmetric(
+                  vertical: 10.h,
+                  horizontal: 8.w,
+                ),
+                physics: const BouncingScrollPhysics(),
+                itemCount: state.initialList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final item = state.initialList[index];
 
-                      final isSelected = state.selectedUsers.contains(item);
+                  final isSelected = state.selectedUsers.contains(item);
 
-                      return GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          context
-                              .read<BottomSheetDataBloc>()
-                              .selectUsersToStartCalculations(item);
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: Row(
-                            children: [
-                              CustomCheckbox(
-                                isAttended: isSelected,
-                                onChanged: () {
-                                  context
-                                      .read<BottomSheetDataBloc>()
-                                      .selectUsersToStartCalculations(item);
-                                },
-                              ),
-                              SizedBox(width: 8.w),
-                              Text(
-                                item,
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      context
+                          .read<BottomSheetDataBloc>()
+                          .selectUsersToStartCalculations(item);
                     },
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 4.h),
+                      padding: EdgeInsets.symmetric(vertical: 4.h),
+                      child: Row(
+                        children: [
+                          CustomCheckbox(
+                            isAttended: isSelected,
+                            onChanged: () {
+                              context
+                                  .read<BottomSheetDataBloc>()
+                                  .selectUsersToStartCalculations(item);
+                            },
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            item,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),

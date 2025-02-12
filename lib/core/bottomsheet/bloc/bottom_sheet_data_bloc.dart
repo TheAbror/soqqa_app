@@ -3,15 +3,15 @@ import 'package:soqqa_app/widget_imports.dart';
 part 'bottom_sheet_data_state.dart';
 
 class BottomSheetDataBloc extends Cubit<BottomSheetDataState> {
-  final String initialValue;
   final List<String> initialList;
+  final List<String> selectedValues;
 
   BottomSheetDataBloc({
-    required this.initialValue,
+    required this.selectedValues,
     required this.initialList,
   }) : super(BottomSheetDataState.initial(
-          initialValue: initialValue,
           initialList: initialList,
+          selectedValues: selectedValues,
         ));
 
   void selectUsersToStartCalculations(String user) {
@@ -19,6 +19,8 @@ class BottomSheetDataBloc extends Cubit<BottomSheetDataState> {
 
     if (!state.selectedUsers.contains(user)) {
       list.add(user);
+    } else {
+      list.remove(user);
     }
 
     emit(state.copyWith(selectedUsers: list));

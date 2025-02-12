@@ -9,11 +9,6 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  final pages = [
-    HomeTab(),
-    const SizedBox(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -22,24 +17,7 @@ class _RootPageState extends State<RootPage> {
         builder: (context, state) {
           return Scaffold(
             backgroundColor: Theme.of(context).colorScheme.background,
-            body: SafeArea(child: pages[state.tabIndex]),
-            bottomNavigationBar: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.business),
-                  label: 'Settings',
-                ),
-              ],
-              currentIndex: state.tabIndex,
-              selectedItemColor: Colors.amber[800],
-              onTap: (value) {
-                context.read<RootBloc>().selectTabIndex(value);
-              },
-            ),
+            body: SafeArea(child: HomeTab()),
           );
         },
       ),
@@ -58,6 +36,7 @@ class _HomeTabState extends State<HomeTab> {
   final fullAmount = TextEditingController();
   final discountAmount = TextEditingController();
   final deliveryAmount = TextEditingController();
+  final usersOrderAmount = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +54,7 @@ class _HomeTabState extends State<HomeTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AppText.title3('Full amount', AppColors.float),
-                    SizedBox(
-                      height: 40,
-                      width: 60,
-                      child: TextField(
-                        controller: fullAmount,
-                        decoration: inputDecoration,
-                      ),
-                    ),
+                    MyField(controller: fullAmount),
                   ],
                 ),
                 SizedBox(height: 10.h),
@@ -90,14 +62,7 @@ class _HomeTabState extends State<HomeTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AppText.title3('Discount rate amount', AppColors.float),
-                    SizedBox(
-                      height: 40,
-                      width: 60,
-                      child: TextField(
-                        controller: discountAmount,
-                        decoration: inputDecoration,
-                      ),
-                    ),
+                    MyField(controller: discountAmount),
                   ],
                 ),
                 SizedBox(height: 10.h),
@@ -105,51 +70,41 @@ class _HomeTabState extends State<HomeTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AppText.title3('Deivery amount', AppColors.float),
-                    SizedBox(
-                      height: 40,
-                      width: 60,
-                      child: TextField(
-                        controller: deliveryAmount,
-                        decoration: inputDecoration,
-                      ),
-                    ),
+                    MyField(controller: deliveryAmount),
                   ],
                 ),
                 SizedBox(height: 10.h),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: state.selectedUsers.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Row(
-                          children: [
-                            Text(state.selectedUsers[index]),
-                            SizedBox(width: 8.w),
-                            GestureDetector(
-                              onTap: () {
-                                context.read<RootBloc>().removeUser(index);
-                              },
-                              child: Icon(
-                                IconsaxPlusLinear.user_remove,
-                                color: AppColors.primary,
+                  child: state.selectedUsers.isEmpty
+                      ? Center(child: Text('Select users to start'))
+                      : ListView.builder(
+                          itemCount: state.selectedUsers.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Row(
+                                children: [
+                                  Text(state.selectedUsers[index]),
+                                  SizedBox(width: 8.w),
+                                  GestureDetector(
+                                    onTap: () {
+                                      context
+                                          .read<RootBloc>()
+                                          .removeUser(index);
+                                    },
+                                    child: Icon(
+                                      IconsaxPlusLinear.user_remove,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              trailing: MyField(controller: usersOrderAmount),
+                              textColor: Theme.of(context).colorScheme.tertiary,
+                            );
+                          },
                         ),
-                        trailing: SizedBox(
-                          height: 40,
-                          width: 60,
-                          child: TextField(
-                            controller: fullAmount,
-                            decoration: inputDecoration,
-                          ),
-                        ),
-                        textColor: Theme.of(context).colorScheme.tertiary,
-                      );
-                    },
-                  ),
                 ),
                 ActionButton(
                   isFilled: false,
@@ -159,7 +114,7 @@ class _HomeTabState extends State<HomeTab> {
                       context,
                       title: 'All users',
                       heightRatio: 0.8,
-                      selectedValue: '',
+                      selectedValues: state.selectedUsers,
                       initialList: state.allUsers,
                     );
 
@@ -182,13 +137,32 @@ class _HomeTabState extends State<HomeTab> {
       ),
     );
   }
+}
 
-  var inputDecoration = InputDecoration(
-    enabledBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.cyan),
-    ),
-    focusedBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.cyan),
-    ),
-  );
+class MyField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const MyField({
+    super.key,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      width: 60,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.cyan),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.cyan),
+          ),
+        ),
+      ),
+    );
+  }
 }
