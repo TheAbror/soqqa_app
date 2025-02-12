@@ -35,61 +35,93 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
-      child: BlocBuilder<RootBloc, RootState>(
-        builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 10.h),
-              ExpenseNameAndAmount(
-                expenseName: 'Full amount',
-                fullAmount: fullAmount,
-              ),
-              ExpenseNameAndAmount(
-                expenseName: 'Discount rate amount',
-                fullAmount: discountAmount,
-              ),
-              ExpenseNameAndAmount(
-                expenseName: 'Deivery amount',
-                fullAmount: deliveryAmount,
-              ),
-              Expanded(
-                child: state.selectedUsers.isEmpty
-                    ? Center(child: Text('Select users to start'))
-                    : ListView.builder(
-                        itemCount: state.selectedUsers.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Row(
+    return BlocBuilder<RootBloc, RootState>(
+      builder: (context, state) {
+        return SizedBox.expand(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10.h),
+                      ExpenseNameAndAmount(
+                        expenseName: 'Full amount',
+                        fullAmount: fullAmount,
+                      ),
+                      ExpenseNameAndAmount(
+                        expenseName: 'Discount rate amount',
+                        fullAmount: discountAmount,
+                      ),
+                      ExpenseNameAndAmount(
+                        expenseName: 'Deivery amount',
+                        fullAmount: deliveryAmount,
+                      ),
+                      state.selectedUsers.isEmpty
+                          ? SizedBox(
+                              height: 200.h,
+                              child:
+                                  Center(child: Text('Select users to start')))
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(state.selectedUsers[index]),
-                                SizedBox(width: 8.w),
-                                GestureDetector(
-                                  onTap: () {
-                                    context.read<RootBloc>().removeUser(index);
+                                Text(
+                                  'Users: ',
+                                  style: TextStyle(
+                                      fontSize: 18, color: AppColors.primary),
+                                ),
+                                ListView.builder(
+                                  itemCount: state.selectedUsers.length,
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Row(
+                                        children: [
+                                          Text(state.selectedUsers[index]),
+                                          SizedBox(width: 8.w),
+                                          GestureDetector(
+                                            onTap: () {
+                                              context
+                                                  .read<RootBloc>()
+                                                  .removeUser(index);
+                                            },
+                                            child: Icon(
+                                              IconsaxPlusLinear.user_remove,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      trailing:
+                                          MyField(controller: usersOrderAmount),
+                                      textColor: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
+                                    );
                                   },
-                                  child: Icon(
-                                    IconsaxPlusLinear.user_remove,
-                                    color: AppColors.primary,
-                                  ),
                                 ),
                               ],
                             ),
-                            trailing: MyField(controller: usersOrderAmount),
-                            textColor: Theme.of(context).colorScheme.tertiary,
-                          );
-                        },
-                      ),
-              ),
-              Buttons(state: state),
-            ],
-          );
-        },
-      ),
+                      SizedBox(height: 200.h),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 0.h,
+                  left: 8.w,
+                  right: 8.w,
+                  child: Buttons(state: state),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

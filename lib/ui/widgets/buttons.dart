@@ -30,12 +30,12 @@ class Buttons extends StatelessWidget {
             }
           },
         ),
-        SizedBox(height: 20),
+        SizedBox(height: 20.h),
         ActionButton(
           text: 'Calculate',
           onPressed: () {},
         ),
-        SizedBox(height: 40),
+        SizedBox(height: 10.h),
       ],
     );
   }
