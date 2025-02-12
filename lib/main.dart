@@ -13,8 +13,6 @@ void main() async {
   boxCurrentUser = await Hive.openBox<CurrentUser>(ShPrefKeys.currentUser);
   boxAllUsers = await Hive.openBox<AllUsers>(ShPrefKeys.allUsers);
 
-  ApiProvider.create();
-
   setUpLogging();
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
