@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:soqqa_app/widget_imports.dart';
 
 part 'root_state.dart';
@@ -42,5 +44,30 @@ class RootBloc extends Cubit<RootState> {
     users.removeAt(index);
 
     emit(state.copyWith(selectedUsers: users));
+  }
+
+  void calculate(
+    String fullAmount, {
+    String? discountPercent,
+    String? deliverySum,
+  }) {
+    //! Task turn all to int  - start
+    var fullAmountAsInt = int.parse(fullAmount);
+    var discountAsInt = 0;
+    var deliveryAsInt = 0;
+
+    if (discountPercent != null) {
+      discountAsInt = int.parse(discountPercent);
+    }
+
+    if (deliverySum != null) {
+      deliveryAsInt = int.parse(deliverySum);
+    }
+    //! Task turn all to int  - end
+
+    var percent = discountAsInt / 100;
+    var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
+    var fullMinusPercent = fullAmountAsInt - fullAmountAsInt * percent;
+    // finalAMOUNT = fullMinusDeliveryFee - (fullMinusDeliveryFee * percent);
   }
 }

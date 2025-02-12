@@ -29,7 +29,7 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   final fullAmount = TextEditingController();
-  final discountAmount = TextEditingController();
+  final discountPercent = TextEditingController();
   final deliveryAmount = TextEditingController();
   final usersOrderAmount = TextEditingController();
 
@@ -53,8 +53,8 @@ class _HomeTabState extends State<HomeTab> {
                         fullAmount: fullAmount,
                       ),
                       ExpenseNameAndAmount(
-                        expenseName: 'Discount rate amount',
-                        fullAmount: discountAmount,
+                        expenseName: 'Discount rate (%)',
+                        fullAmount: discountPercent,
                       ),
                       ExpenseNameAndAmount(
                         expenseName: 'Deivery amount',
@@ -63,8 +63,10 @@ class _HomeTabState extends State<HomeTab> {
                       state.selectedUsers.isEmpty
                           ? SizedBox(
                               height: 200.h,
-                              child:
-                                  Center(child: Text('Select users to start')))
+                              child: Center(
+                                child: Text('Select users to start'),
+                              ),
+                            )
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -115,7 +117,42 @@ class _HomeTabState extends State<HomeTab> {
                   bottom: 0.h,
                   left: 8.w,
                   right: 8.w,
-                  child: Buttons(state: state),
+                  child: Column(
+                    children: [
+                      ActionButton(
+                        isFilled: false,
+                        text: 'Add more users',
+                        onPressed: () async {
+                          final result = await PrimaryBottomSheet.show(
+                            context,
+                            selectedValues: state.selectedUsers,
+                            initialList: state.allUsers,
+                          );
+
+                          if (result != null && result.isNotEmpty) {
+                            if (!context.mounted) return;
+                            context.read<RootBloc>().addMultipleUsers(result);
+                          }
+                        },
+                      ),
+                      SizedBox(height: 20.h),
+                      ActionButton(
+                        text: 'Calculate',
+                        onPressed: () {
+                          final fullOrderAmount = fullAmount.text;
+                          final discountPercentage = discountPercent.text;
+                          final deliverySum = deliveryAmount.text;
+
+                          context.read<RootBloc>().calculate(
+                                fullOrderAmount,
+                                discountPercent: discountPercentage,
+                                deliverySum: deliverySum,
+                              );
+                        },
+                      ),
+                      SizedBox(height: 10.h),
+                    ],
+                  ),
                 ),
               ],
             ),

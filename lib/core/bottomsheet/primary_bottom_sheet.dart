@@ -1,19 +1,12 @@
 import 'package:soqqa_app/widget_imports.dart';
 
 class PrimaryBottomSheet extends StatelessWidget {
-  final String title;
-  final double heightRatio;
-
   const PrimaryBottomSheet({
     super.key,
-    required this.title,
-    required this.heightRatio,
   });
 
   static Future<List<String>?> show(
     BuildContext parentContext, {
-    required String title,
-    required double heightRatio,
     required List<String> selectedValues,
     required List<String> initialList,
   }) async {
@@ -34,10 +27,7 @@ class PrimaryBottomSheet extends StatelessWidget {
             initialList: initialList,
             selectedValues: selectedValues,
           ),
-          child: PrimaryBottomSheet(
-            title: title,
-            heightRatio: heightRatio,
-          ),
+          child: PrimaryBottomSheet(),
         );
       },
     );
@@ -48,8 +38,8 @@ class PrimaryBottomSheet extends StatelessWidget {
     return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
       builder: (context, state) {
         return DefaultBottomSheet(
-          title: title,
-          heightRatio: heightRatio,
+          title: 'All users',
+          heightRatio: 0.8,
           isActionEnabled: true,
           actionText: 'Save',
           isActionAvailable: true,
