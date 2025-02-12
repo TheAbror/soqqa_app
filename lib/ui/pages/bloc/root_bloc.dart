@@ -17,7 +17,7 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(allUsers: db));
   }
 
-  void addUser(String user) {
+  void addNewUser(String user) {
     AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
 
     if (savedUsers != null) {
@@ -46,29 +46,16 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(nameAndSum: newlist));
   }
 
-  //  void chooseSingle(int? id) {
-  //   if (id != null) {
-  //     final selectedValue = state.searchedList.firstWhere(
-  //       (element) => element.user_id == id,
-  //       orElse: () => state.searchedList.first,
-  //     );
-
-  //     emit(state.copyWith(recepientId: selectedValue.user_id));
-  //   }
-  // }
-
-// List<NameAndSum> nameAndSum
   void chooseSingle(
+    int index,
     double howMuchWasOrder,
     String name,
   ) {
-    final updatedList = List<NameAndSum>.from(state.nameAndSum);
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
 
-    // var user = state.nameAndSum.firstWhere((e) => e.name == name);
-    // final asdsad = user.bill = howMuchWasOrder;
-    updatedList.firstWhere((e) => e.name == name).bill = howMuchWasOrder;
+    list[index] = NameAndSum(name: name, bill: howMuchWasOrder);
 
-    emit(state.copyWith(nameAndSum: updatedList));
+    emit(state.copyWith(nameAndSum: list));
   }
 
   void removeUser(int index) {
@@ -89,11 +76,11 @@ class RootBloc extends Cubit<RootState> {
     var discountAsInt = 0;
     var deliveryAsInt = 0;
 
-    if (discountPercent != null) {
+    if (discountPercent != null && discountPercent.isNotEmpty) {
       discountAsInt = int.parse(discountPercent);
     }
 
-    if (deliverySum != null) {
+    if (deliverySum != null && deliverySum.isNotEmpty) {
       deliveryAsInt = int.parse(deliverySum);
     }
     //! Task turn all to int  - end
@@ -105,9 +92,15 @@ class RootBloc extends Cubit<RootState> {
     debugPrint(finalSum.toString());
 
     var peopleCount = state.selectedUsers.length;
-    var delvieryPerPerson = deliveryAsInt / peopleCount;
+    //use only if not empty
+    double delvieryPerPerson = 0;
+    if (deliveryAsInt != 0) {
+      delvieryPerPerson = deliveryAsInt / peopleCount;
+    }
     //billPerPersonWithDelivery - if all ordered same thing or decided to split the bill
     var perPerson = (finalSum / peopleCount) + delvieryPerPerson;
     debugPrint(perPerson.toString());
+
+    //TODO add functionality - where each user has different value
   }
 }

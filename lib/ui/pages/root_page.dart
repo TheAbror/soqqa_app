@@ -31,7 +31,6 @@ class _HomeTabState extends State<HomeTab> {
   final fullAmount = TextEditingController();
   final discountPercent = TextEditingController();
   final deliveryAmount = TextEditingController();
-  final usersOrderAmount = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +56,7 @@ class _HomeTabState extends State<HomeTab> {
                         fullAmount: discountPercent,
                       ),
                       ExpenseNameAndAmount(
-                        expenseName: 'Deivery amount',
+                        expenseName: 'Delivery amount',
                         fullAmount: deliveryAmount,
                       ),
                       state.selectedUsers.isEmpty
@@ -67,54 +66,8 @@ class _HomeTabState extends State<HomeTab> {
                                 child: Text('Select users to start'),
                               ),
                             )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Users: ',
-                                  style: TextStyle(
-                                      fontSize: 18, color: AppColors.primary),
-                                ),
-                                ListView.builder(
-                                  itemCount: state.selectedUsers.length,
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      title: Row(
-                                        children: [
-                                          Text(state.selectedUsers[index]),
-                                          SizedBox(width: 8.w),
-                                          GestureDetector(
-                                            onTap: () {
-                                              context
-                                                  .read<RootBloc>()
-                                                  .removeUser(index);
-                                            },
-                                            child: Icon(
-                                              IconsaxPlusLinear.user_remove,
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      trailing: MyField(
-                                        controller: usersOrderAmount,
-                                        onChanged: (value) {
-                                          context.read<RootBloc>().chooseSingle(
-                                              double.parse(
-                                                  usersOrderAmount.text),
-                                              state.selectedUsers[index]);
-                                        },
-                                      ),
-                                      textColor: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                    );
-                                  },
-                                ),
-                              ],
+                          : ListOfSelectedUsers(
+                              state: state,
                             ),
                       SizedBox(height: 200.h),
                     ],
@@ -128,7 +81,7 @@ class _HomeTabState extends State<HomeTab> {
                     children: [
                       ActionButton(
                         isFilled: false,
-                        text: 'Add more users',
+                        text: 'Choose users',
                         onPressed: () async {
                           final result = await PrimaryBottomSheet.show(
                             context,
@@ -166,6 +119,93 @@ class _HomeTabState extends State<HomeTab> {
           ),
         );
       },
+    );
+  }
+}
+
+class ListOfSelectedUsers extends StatelessWidget {
+  final RootState state;
+
+  const ListOfSelectedUsers({
+    super.key,
+    required this.state,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Users: ',
+          style: TextStyle(fontSize: 18, color: AppColors.primary),
+        ),
+        ListView.builder(
+          itemCount: state.selectedUsers.length,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return SingleUserData(
+              state: state,
+              index: index,
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class SingleUserData extends StatefulWidget {
+  final int index;
+
+  final RootState state;
+
+  const SingleUserData({
+    super.key,
+    required this.index,
+    required this.state,
+  });
+
+  @override
+  State<SingleUserData> createState() => _SingleUserDataState();
+}
+
+class _SingleUserDataState extends State<SingleUserData> {
+  final usersOrderAmount = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Row(
+        children: [
+          Text(widget.state.selectedUsers[widget.index]),
+          SizedBox(width: 8.w),
+          GestureDetector(
+            onTap: () {
+              context.read<RootBloc>().removeUser(widget.index);
+            },
+            child: Icon(
+              IconsaxPlusLinear.user_remove,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+      trailing: MyField(
+        controller: usersOrderAmount,
+        onChanged: (value) {
+          if (usersOrderAmount.text.isNotEmpty) {
+            context.read<RootBloc>().chooseSingle(
+                  widget.index,
+                  double.parse(usersOrderAmount.text),
+                  widget.state.selectedUsers[widget.index],
+                );
+          }
+        },
+      ),
+      textColor: Theme.of(context).colorScheme.tertiary,
     );
   }
 }
