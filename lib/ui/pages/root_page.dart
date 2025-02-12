@@ -99,8 +99,15 @@ class _HomeTabState extends State<HomeTab> {
                                           ),
                                         ],
                                       ),
-                                      trailing:
-                                          MyField(controller: usersOrderAmount),
+                                      trailing: MyField(
+                                        controller: usersOrderAmount,
+                                        onChanged: (value) {
+                                          context.read<RootBloc>().chooseSingle(
+                                              double.parse(
+                                                  usersOrderAmount.text),
+                                              state.selectedUsers[index]);
+                                        },
+                                      ),
                                       textColor: Theme.of(context)
                                           .colorScheme
                                           .tertiary,

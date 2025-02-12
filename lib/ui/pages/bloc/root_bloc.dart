@@ -36,6 +36,39 @@ class RootBloc extends Cubit<RootState> {
 
   void addMultipleUsers(List<String> users) {
     emit(state.copyWith(selectedUsers: users));
+
+    List<NameAndSum> newlist = [];
+
+    for (var element in state.selectedUsers) {
+      newlist.add(NameAndSum(bill: 0, name: element));
+    }
+
+    emit(state.copyWith(nameAndSum: newlist));
+  }
+
+  //  void chooseSingle(int? id) {
+  //   if (id != null) {
+  //     final selectedValue = state.searchedList.firstWhere(
+  //       (element) => element.user_id == id,
+  //       orElse: () => state.searchedList.first,
+  //     );
+
+  //     emit(state.copyWith(recepientId: selectedValue.user_id));
+  //   }
+  // }
+
+// List<NameAndSum> nameAndSum
+  void chooseSingle(
+    double howMuchWasOrder,
+    String name,
+  ) {
+    final updatedList = List<NameAndSum>.from(state.nameAndSum);
+
+    // var user = state.nameAndSum.firstWhere((e) => e.name == name);
+    // final asdsad = user.bill = howMuchWasOrder;
+    updatedList.firstWhere((e) => e.name == name).bill = howMuchWasOrder;
+
+    emit(state.copyWith(nameAndSum: updatedList));
   }
 
   void removeUser(int index) {
@@ -67,7 +100,14 @@ class RootBloc extends Cubit<RootState> {
 
     var percent = discountAsInt / 100;
     var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
-    var fullMinusPercent = fullAmountAsInt - fullAmountAsInt * percent;
-    // finalAMOUNT = fullMinusDeliveryFee - (fullMinusDeliveryFee * percent);
+    //fullMinusDeliveryMinusPercentPercent
+    var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * percent);
+    debugPrint(finalSum.toString());
+
+    var peopleCount = state.selectedUsers.length;
+    var delvieryPerPerson = deliveryAsInt / peopleCount;
+    //billPerPersonWithDelivery - if all ordered same thing or decided to split the bill
+    var perPerson = (finalSum / peopleCount) + delvieryPerPerson;
+    debugPrint(perPerson.toString());
   }
 }

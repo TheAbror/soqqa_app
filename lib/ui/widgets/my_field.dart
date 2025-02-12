@@ -2,10 +2,12 @@ import 'package:soqqa_app/widget_imports.dart';
 
 class MyField extends StatelessWidget {
   final TextEditingController controller;
+  final void Function(String)? onChanged;
 
   const MyField({
     super.key,
     required this.controller,
+    this.onChanged,
   });
 
   @override
@@ -14,7 +16,9 @@ class MyField extends StatelessWidget {
       height: 40.w,
       width: 60.w,
       child: TextField(
+        onChanged: onChanged,
         controller: controller,
+        textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.primary),
