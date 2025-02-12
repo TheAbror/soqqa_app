@@ -18,39 +18,21 @@ class AddUserBottomSheet extends StatelessWidget {
       ),
       isScrollControlled: true,
       builder: (context) {
-        return BlocProvider(
-          create: (context) => BottomSheetDataBloc(
-            initialValue: '',
-            initialList: [],
-          ),
-          child: AddUserBottomSheet(),
-        );
+        return AddUserBottomSheet();
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-      builder: (context, state) {
-        return DefaultBottomSheet(
-          title: 'Add new user',
-          heightRatio: 0.4,
-          isActionEnabled: state.isButtonEnabled,
-          actionText: '',
-          isConfirmationNeeded: false,
-          action: () {},
-          child: BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-            builder: (context, state) {
-              if (state.blocProgress == BlocProgress.IS_LOADING) {
-                return const PrimaryBottomSheetLoader();
-              }
-
-              return AddUserBody();
-            },
-          ),
-        );
-      },
+    return DefaultBottomSheet(
+      title: 'Add new user',
+      heightRatio: 0.4,
+      isActionEnabled: false,
+      actionText: '',
+      isConfirmationNeeded: false,
+      action: () {},
+      child: AddUserBody(),
     );
   }
 }
@@ -67,31 +49,27 @@ class AddUserBodyState extends State<AddUserBody> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BottomSheetDataBloc, BottomSheetDataState>(
-      builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            children: [
-              Divider(
-                color: Theme.of(context).colorScheme.inversePrimary,
-                height: 1.h,
-                thickness: 1.h,
-              ),
-              SizedBox(height: 20),
-              NewUserTextField(usernameController: controller),
-              Spacer(),
-              ActionButton(
-                text: 'Add',
-                onPressed: () {
-                  Navigator.pop(context, controller.text);
-                },
-              ),
-              SizedBox(height: 40.h),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        children: [
+          Divider(
+            color: Theme.of(context).colorScheme.inversePrimary,
+            height: 1.h,
+            thickness: 1.h,
           ),
-        );
-      },
+          SizedBox(height: 20),
+          NewUserTextField(usernameController: controller),
+          Spacer(),
+          ActionButton(
+            text: 'Add',
+            onPressed: () {
+              Navigator.pop(context, controller.text);
+            },
+          ),
+          SizedBox(height: 40.h),
+        ],
+      ),
     );
   }
 }

@@ -160,6 +160,7 @@ class _BodyState extends State<_Body> {
                   if (result != null && result.isNotEmpty) {
                     if (!context.mounted) return;
                     context.read<RootBloc>().addUser(result);
+                    context.read<BottomSheetDataBloc>().addUser(result);
                   }
                 },
               ),

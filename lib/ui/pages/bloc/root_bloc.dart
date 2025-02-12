@@ -20,17 +20,19 @@ class RootBloc extends Cubit<RootState> {
   }
 
   void addUser(String user) {
-    final users = List<String>.from(state.allUsers);
+    AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
 
-    if (!state.allUsers.contains(user)) {
-      users.add(user);
+    if (savedUsers != null) {
+      if (!savedUsers.allUsers.contains(user)) {
+        savedUsers.allUsers.add(user);
 
-      emit(state.copyWith(allUsers: users));
+        emit(state.copyWith(allUsers: savedUsers.allUsers));
 
-      boxAllUsers.put(
-        ShPrefKeys.allUsers,
-        AllUsers(allUsers: users),
-      );
+        boxAllUsers.put(
+          ShPrefKeys.allUsers,
+          AllUsers(allUsers: savedUsers.allUsers),
+        );
+      }
     }
   }
 

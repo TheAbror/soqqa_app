@@ -57,6 +57,7 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   final fullAmount = TextEditingController();
   final discountAmount = TextEditingController();
+  final deliveryAmount = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +78,10 @@ class _HomeTabState extends State<HomeTab> {
                     SizedBox(
                       height: 40,
                       width: 60,
-                      child: TextField(controller: fullAmount),
+                      child: TextField(
+                        controller: fullAmount,
+                        decoration: inputDecoration,
+                      ),
                     ),
                   ],
                 ),
@@ -89,7 +93,25 @@ class _HomeTabState extends State<HomeTab> {
                     SizedBox(
                       height: 40,
                       width: 60,
-                      child: TextField(controller: discountAmount),
+                      child: TextField(
+                        controller: discountAmount,
+                        decoration: inputDecoration,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppText.title3('Deivery amount', AppColors.float),
+                    SizedBox(
+                      height: 40,
+                      width: 60,
+                      child: TextField(
+                        controller: deliveryAmount,
+                        decoration: inputDecoration,
+                      ),
                     ),
                   ],
                 ),
@@ -101,21 +123,29 @@ class _HomeTabState extends State<HomeTab> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(state.selectedUsers[index]),
+                        title: Row(
+                          children: [
+                            Text(state.selectedUsers[index]),
+                            SizedBox(width: 8.w),
+                            GestureDetector(
+                              onTap: () {
+                                context.read<RootBloc>().removeUser(index);
+                              },
+                              child: Icon(
+                                IconsaxPlusLinear.user_remove,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
                         trailing: SizedBox(
                           height: 40,
                           width: 60,
-                          child: TextField(controller: fullAmount),
+                          child: TextField(
+                            controller: fullAmount,
+                            decoration: inputDecoration,
+                          ),
                         ),
-                        // GestureDetector(
-                        //   onTap: () {
-                        //     context.read<RootBloc>().removeUser(index);
-                        //   },
-                        //   child: Icon(
-                        //     IconsaxPlusLinear.user_remove,
-                        //     color: AppColors.primary,
-                        //   ),
-                        // ),
                         textColor: Theme.of(context).colorScheme.tertiary,
                       );
                     },
@@ -127,7 +157,7 @@ class _HomeTabState extends State<HomeTab> {
                   onPressed: () async {
                     final result = await PrimaryBottomSheet.show(
                       context,
-                      title: 'Add more users',
+                      title: 'All users',
                       heightRatio: 0.8,
                       selectedValue: '',
                       initialList: state.allUsers,
@@ -152,4 +182,13 @@ class _HomeTabState extends State<HomeTab> {
       ),
     );
   }
+
+  var inputDecoration = InputDecoration(
+    enabledBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: Colors.cyan),
+    ),
+    focusedBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: Colors.cyan),
+    ),
+  );
 }

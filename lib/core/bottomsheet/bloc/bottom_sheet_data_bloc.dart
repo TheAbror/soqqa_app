@@ -23,4 +23,14 @@ class BottomSheetDataBloc extends Cubit<BottomSheetDataState> {
 
     emit(state.copyWith(selectedUsers: list));
   }
+
+  void addUser(String user) {
+    final list = List<String>.from(state.initialList);
+
+    if (!state.initialList.contains(user)) {
+      list.add(user);
+    }
+
+    emit(state.copyWith(initialList: list));
+  }
 }
