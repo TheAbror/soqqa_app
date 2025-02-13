@@ -85,11 +85,15 @@ class RootBloc extends Cubit<RootState> {
     }
     //! Task turn all to int  - end
 
+    //! Discount & fullPrice - delivery  - start
     var percent = discountAsInt / 100;
     var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
+
     //fullMinusDeliveryMinusPercentPercent
     var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * percent);
     debugPrint(finalSum.toString());
+
+    //! Discount & fullPrice - delivery  - end
 
     var peopleCount = state.selectedUsers.length;
     //use only if not empty
@@ -101,6 +105,26 @@ class RootBloc extends Cubit<RootState> {
     var perPerson = (finalSum / peopleCount) + delvieryPerPerson;
     debugPrint(perPerson.toString());
 
-    //TODO add functionality - where each user has different value
+    var bekzodBill = 20000;
+    var letsConsiderBekzod = bekzodBill + (bekzodBill * percent);
+    debugPrint(letsConsiderBekzod.toString());
+
+    calculatedEach(percent);
+  }
+
+  void calculatedEach(double discount) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+
+    for (var element in list) {
+      newlist.add(
+        NameAndSum(
+          name: element.name,
+          bill: element.bill + (element.bill * discount),
+        ),
+      );
+    }
+
+    emit(state.copyWith(nameAndSum: newlist));
   }
 }
