@@ -48,8 +48,8 @@ class RootBloc extends Cubit<RootState> {
 
   void chooseSingle(
     int index,
-    double howMuchWasOrder,
     String name,
+    double howMuchWasOrder,
   ) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
 
@@ -95,20 +95,6 @@ class RootBloc extends Cubit<RootState> {
 
     //! Discount & fullPrice - delivery  - end
 
-    var peopleCount = state.selectedUsers.length;
-    //use only if not empty
-    double delvieryPerPerson = 0;
-    if (deliveryAsInt != 0) {
-      delvieryPerPerson = deliveryAsInt / peopleCount;
-    }
-    //billPerPersonWithDelivery - if all ordered same thing or decided to split the bill
-    var perPerson = (finalSum / peopleCount) + delvieryPerPerson;
-    debugPrint(perPerson.toString());
-
-    var bekzodBill = 20000;
-    var letsConsiderBekzod = bekzodBill + (bekzodBill * percent);
-    debugPrint(letsConsiderBekzod.toString());
-
     calculatedEach(percent);
   }
 
@@ -120,11 +106,15 @@ class RootBloc extends Cubit<RootState> {
       newlist.add(
         NameAndSum(
           name: element.name,
-          bill: element.bill + (element.bill * discount),
+          bill: element.bill - (element.bill * discount),
         ),
       );
     }
 
-    emit(state.copyWith(nameAndSum: newlist));
+    emit(state.copyWith(finalResult: newlist, isResultReady: true));
+  }
+
+  void makeIsReadyFalse() {
+    emit(state.copyWith(isResultReady: false));
   }
 }
