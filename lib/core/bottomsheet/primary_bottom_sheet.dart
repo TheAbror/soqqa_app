@@ -113,6 +113,18 @@ class _BodyState extends State<_Body> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              context
+                                  .read<BottomSheetDataBloc>()
+                                  .removeUser(index);
+                            },
+                            child: Icon(
+                              IconsaxPlusLinear.user_remove,
+                              color: AppColors.primary,
+                            ),
+                          ),
                         ],
                       ),
                     ),

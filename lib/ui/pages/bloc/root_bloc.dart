@@ -66,6 +66,14 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(selectedUsers: users));
   }
 
+  void removeUserFromDb(int index) {
+    final users = List<String>.from(state.allUsers);
+
+    users.removeAt(index);
+
+    emit(state.copyWith(allUsers: users));
+  }
+
   void calculate(
     String fullAmount, {
     String? discountPercent,
