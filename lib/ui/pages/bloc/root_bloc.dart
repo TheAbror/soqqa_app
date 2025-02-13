@@ -94,19 +94,27 @@ class RootBloc extends Cubit<RootState> {
     //! Task turn all to int  - end
 
     //! Discount & fullPrice - delivery  - start
-    var percent = discountAsInt / 100;
+    var discount = 0.0;
+    if (discount != 0) {
+      discount = discountAsInt / 100;
+    }
     var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
+    var fullPlusDeliveryFee = fullAmountAsInt - deliveryAsInt;
 
     //fullMinusDeliveryMinusPercentPercent
-    var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * percent);
+    var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * discount);
     debugPrint(finalSum.toString());
 
     //! Discount & fullPrice - delivery  - end
 
-    calculatedEach(percent);
+    if (discount != 0 && discount != 0.0) {
+      calculatedEachWithDiscount(discount);
+    } else {
+      calculatedWithoutDiscount(deliveryAsInt);
+    }
   }
 
-  void calculatedEach(double discount) {
+  void calculatedEachWithDiscount(double discount) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
     List<NameAndSum> newlist = [];
 
@@ -121,6 +129,25 @@ class RootBloc extends Cubit<RootState> {
 
     emit(state.copyWith(finalResult: newlist, isResultReady: true));
   }
+
+  void calculatedWithoutDiscount(int deliveryAsInt) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+    final deliveryPerPerson = deliveryAsInt / state.nameAndSum.length;
+
+    for (var element in list) {
+      newlist.add(
+        NameAndSum(
+          name: element.name,
+          bill: element.bill + deliveryPerPerson,
+        ),
+      );
+    }
+
+    emit(state.copyWith(finalResult: newlist, isResultReady: true));
+  }
+
+  //write case where there is no discount
 
   void makeIsReadyFalse() {
     emit(state.copyWith(isResultReady: false));
