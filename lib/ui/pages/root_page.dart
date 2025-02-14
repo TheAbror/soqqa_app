@@ -31,6 +31,7 @@ class _HomeTabState extends State<HomeTab> {
   final fullAmount = TextEditingController();
   final discountPercent = TextEditingController();
   final deliveryAmount = TextEditingController();
+  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +59,14 @@ class _HomeTabState extends State<HomeTab> {
                         expenseName: 'Full amount',
                         fullAmount: fullAmount,
                       ),
-                      ExpenseNameAndAmount(
-                        expenseName: 'Discount rate (%)',
+                      ExpenseNameAndAmountForDiscount(
+                        expenseName: 'Discount rate',
                         fullAmount: discountPercent,
+                        tooltipkey: tooltipkey,
+                        onTap: () {
+                          // Show Tooltip programmatically on button tap.
+                          tooltipkey.currentState?.ensureTooltipVisible();
+                        },
                       ),
                       ExpenseNameAndAmount(
                         expenseName: 'Delivery amount',
@@ -133,15 +139,19 @@ class Buttons extends StatelessWidget {
           ActionButton(
             text: 'Calculate',
             onPressed: () {
-              final fullOrderAmount = fullAmount.text;
-              final discountPercentage = discountPercent.text;
-              final deliverySum = deliveryAmount.text;
+              if (state.selectedUsers.isNotEmpty) {
+                final fullOrderAmount = fullAmount.text;
+                final discountPercentage = discountPercent.text;
+                final deliverySum = deliveryAmount.text;
 
-              context.read<RootBloc>().calculate(
-                    fullOrderAmount,
-                    discountPercent: discountPercentage,
-                    deliverySum: deliverySum,
-                  );
+                context.read<RootBloc>().calculate(
+                      fullOrderAmount,
+                      discountPercent: discountPercentage,
+                      deliverySum: deliverySum,
+                    );
+              } else {
+                showMessage('No-one selcted yet', isError: true);
+              }
             },
           ),
           SizedBox(height: 10.h),

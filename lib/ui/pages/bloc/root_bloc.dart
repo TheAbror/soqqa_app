@@ -124,8 +124,6 @@ class RootBloc extends Cubit<RootState> {
     }
   }
 
-  //TODO write case with discount in soums
-
   void calculatedDiscountInSOUMS(
     double fullSum,
     double delivery,
