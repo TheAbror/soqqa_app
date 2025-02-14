@@ -95,23 +95,41 @@ class RootBloc extends Cubit<RootState> {
 
     //! Discount & fullPrice - delivery  - start
     var discount = 0.0;
-    if (discount != 0) {
+    if (discountAsInt != 0) {
       discount = discountAsInt / 100;
     }
     var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
     var fullPlusDeliveryFee = fullAmountAsInt - deliveryAsInt;
-
     //fullMinusDeliveryMinusPercentPercent
     var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * discount);
-    debugPrint(finalSum.toString());
 
     //! Discount & fullPrice - delivery  - end
 
-    if (discount != 0 && discount != 0.0) {
+    if (discount != 0 && discount < 99) {
+      calculatedDiscountInSOUMS(discount);
+    } else if (discount != 0) {
       calculatedEachWithDiscount(discount);
     } else {
       calculatedWithoutDiscount(deliveryAsInt);
     }
+  }
+
+  //TODO write case with discount in soums
+
+  void calculatedDiscountInSOUMS(double discount) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+
+    // for (var element in list) {
+    //   newlist.add(
+    //     NameAndSum(
+    //       name: element.name,
+    //       bill: element.bill - (element.bill * discount),
+    //     ),
+    //   );
+    // }
+
+    // emit(state.copyWith(finalResult: newlist, isResultReady: true));
   }
 
   void calculatedEachWithDiscount(double discount) {
@@ -146,8 +164,6 @@ class RootBloc extends Cubit<RootState> {
 
     emit(state.copyWith(finalResult: newlist, isResultReady: true));
   }
-
-  //write case where there is no discount
 
   void makeIsReadyFalse() {
     emit(state.copyWith(isResultReady: false));
