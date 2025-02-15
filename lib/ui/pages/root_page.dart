@@ -37,9 +37,14 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
     return BlocConsumer<RootBloc, RootState>(
       listener: (context, state) {
-        //
-
-        if (state.isResultReady) {
+        if (!state.isFullSoumMatchWithEachPersonTotal && state.isResultReady) {
+          showMessage(
+            'Full amount does not match user total sum',
+            isError: true,
+          );
+          context.read<RootBloc>().makeIsFullSoumMatchWithEachPersonTotal();
+        }
+        if (state.isResultReady && state.isFullSoumMatchWithEachPersonTotal) {
           resultDialog(context, state);
         }
       },

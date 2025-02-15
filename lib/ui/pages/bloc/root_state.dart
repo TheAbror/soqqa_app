@@ -1,6 +1,7 @@
 part of 'root_bloc.dart';
 
 class RootState extends Equatable {
+  final bool isFullSoumMatchWithEachPersonTotal;
   final bool isResultReady;
   final List<String> allUsers;
   final List<String> selectedUsers;
@@ -8,6 +9,7 @@ class RootState extends Equatable {
   final List<NameAndSum> finalResult;
 
   const RootState({
+    required this.isFullSoumMatchWithEachPersonTotal,
     required this.isResultReady,
     required this.allUsers,
     required this.selectedUsers,
@@ -17,6 +19,7 @@ class RootState extends Equatable {
 
   factory RootState.initial() {
     return RootState(
+      isFullSoumMatchWithEachPersonTotal: true,
       isResultReady: false,
       allUsers: [],
       selectedUsers: [],
@@ -26,6 +29,7 @@ class RootState extends Equatable {
   }
 
   RootState copyWith({
+    bool? isFullSoumMatchWithEachPersonTotal,
     bool? isResultReady,
     List<String>? allUsers,
     List<String>? selectedUsers,
@@ -33,6 +37,8 @@ class RootState extends Equatable {
     List<NameAndSum>? finalResult,
   }) {
     return RootState(
+      isFullSoumMatchWithEachPersonTotal: isFullSoumMatchWithEachPersonTotal ??
+          this.isFullSoumMatchWithEachPersonTotal,
       isResultReady: isResultReady ?? this.isResultReady,
       allUsers: allUsers ?? this.allUsers,
       selectedUsers: selectedUsers ?? this.selectedUsers,
@@ -43,7 +49,7 @@ class RootState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isResultReady,
+        isFullSoumMatchWithEachPersonTotal,
         allUsers,
         selectedUsers,
         nameAndSum,

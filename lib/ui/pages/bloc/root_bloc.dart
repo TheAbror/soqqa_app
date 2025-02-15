@@ -74,6 +74,34 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(allUsers: users));
   }
 
+  void makeIsReadyFalse() {
+    emit(state.copyWith(isResultReady: false));
+  }
+
+  void makeIsFullSoumMatchWithEachPersonTotal() {
+    emit(state.copyWith(isFullSoumMatchWithEachPersonTotal: false));
+  }
+
+  void soumOfOrdersISNotEqualToFullAmount(double fullAmountMinusDelivery) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+    //TODO add minus delivery
+
+    final howManyPeopleSelcted = state.selectedUsers.length;
+    double fullAmount = 0;
+
+    for (var element in list) {
+      fullAmount = fullAmount + element.bill;
+    }
+    bool isMatch = (fullAmount == fullAmountMinusDelivery);
+
+    emit(
+      state.copyWith(
+        isFullSoumMatchWithEachPersonTotal: isMatch,
+      ),
+    );
+  }
+
   void calculate(
     String fullAmount, {
     String? discountPercent,
@@ -91,6 +119,7 @@ class RootBloc extends Cubit<RootState> {
     if (deliverySum != null && deliverySum.isNotEmpty) {
       deliveryAsInt = double.parse(deliverySum);
     }
+
     //! Task turn all to int  - end
 
     //! Discount & fullPrice - delivery  - start
@@ -108,6 +137,8 @@ class RootBloc extends Cubit<RootState> {
     //fullMinusDeliveryMinusPercentPercent
     var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * discount);
     var discountInSoums = fullMinusDeliveryFee - discountAsInt;
+
+    soumOfOrdersISNotEqualToFullAmount(fullMinusDeliveryFee);
 
     //! Discount & fullPrice - delivery  - end
 
@@ -147,6 +178,7 @@ class RootBloc extends Cubit<RootState> {
 
     emit(state.copyWith(finalResult: newlist, isResultReady: true));
   }
+  //TODO add obslujivaniye
 
   void calculatedEachWithPercentDiscount(double discount, double delivery) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
@@ -181,9 +213,5 @@ class RootBloc extends Cubit<RootState> {
     }
 
     emit(state.copyWith(finalResult: newlist, isResultReady: true));
-  }
-
-  void makeIsReadyFalse() {
-    emit(state.copyWith(isResultReady: false));
   }
 }
