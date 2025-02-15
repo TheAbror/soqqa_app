@@ -7,6 +7,149 @@ part 'root_state.dart';
 class RootBloc extends Cubit<RootState> {
   RootBloc() : super(RootState.initial());
 
+  void isFullSoumMatchWithEachPersonTotal(double fullAmountMinusDelivery) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+    //TODO add minus delivery
+
+    final howManyPeopleSelcted = state.selectedUsers.length;
+    double fullAmount = 0;
+
+    for (var element in list) {
+      fullAmount = fullAmount + element.bill;
+    }
+    bool isMatch = (fullAmount == fullAmountMinusDelivery);
+
+    emit(state.copyWith(isFullSoumMatchWithEachPersonTotal: isMatch));
+  }
+
+  void calculate(
+    String fullAmount, {
+    String? discountPercent,
+    String? deliverySum,
+  }) {
+    //! Task turn all to int  - start
+    var fullAmountAsInt = double.parse(fullAmount);
+    var discountAsInt = 0.0;
+    var deliveryAsInt = 0.0;
+
+    if (discountPercent != null && discountPercent.isNotEmpty) {
+      discountAsInt = double.parse(discountPercent);
+    }
+
+    if (deliverySum != null && deliverySum.isNotEmpty) {
+      deliveryAsInt = double.parse(deliverySum);
+    }
+
+    //! Task turn all to int  - end
+
+    //! Discount & fullPrice - delivery  - start
+    var discount = 0.0;
+    if (discountAsInt != 0) {
+      if (discountAsInt > 99) {
+        discount = discountAsInt;
+      } else {
+        discount = discountAsInt / 100;
+      }
+    }
+
+    var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
+    var fullPlusDeliveryFee = fullAmountAsInt - deliveryAsInt;
+    //fullMinusDeliveryMinusPercentPercent
+    var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * discount);
+    var discountInSoums = fullMinusDeliveryFee - discountAsInt;
+
+    isFullSoumMatchWithEachPersonTotal(fullMinusDeliveryFee);
+
+    //! Discount & fullPrice - delivery  - end
+    if (state.isFullSoumMatchWithEachPersonTotal) {
+      if (discount != 0 && discountAsInt > 99) {
+        calculatedDiscountInSOUMS(
+          fullAmountAsInt,
+          deliveryAsInt,
+          discountAsInt,
+        );
+      } else if (discount != 0) {
+        calculatedEachWithPercentDiscount(discount, deliveryAsInt);
+      } else {
+        calculatedWithoutDiscount(deliveryAsInt);
+      }
+    }
+  }
+
+  void calculatedDiscountInSOUMS(
+    double fullSum,
+    double delivery,
+    double discountInSoums,
+  ) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+
+    final discountInSoumsForEachPerson = discountInSoums / list.length;
+    //work on delivery
+    final deliveryPerPerson = delivery / list.length;
+
+    for (var element in list) {
+      newlist.add(
+        NameAndSum(
+          name: element.name,
+          bill: element.bill - discountInSoumsForEachPerson + deliveryPerPerson,
+        ),
+      );
+    }
+
+    emit(state.copyWith(
+      finalResult: newlist,
+      isResultReady: true,
+      isFullSoumMatchWithEachPersonTotal: true,
+    ));
+  }
+
+  void calculatedEachWithPercentDiscount(double discount, double delivery) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+
+    final deliveryPerPerson = delivery / list.length;
+
+    for (var element in list) {
+      newlist.add(
+        NameAndSum(
+          name: element.name,
+          bill: element.bill - (element.bill * discount) + deliveryPerPerson,
+        ),
+      );
+    }
+
+    emit(state.copyWith(
+      finalResult: newlist,
+      isResultReady: true,
+      isFullSoumMatchWithEachPersonTotal: true,
+    ));
+  }
+
+  void calculatedWithoutDiscount(double deliveryAsInt) {
+    final list = List<NameAndSum>.from(state.nameAndSum).toList();
+    List<NameAndSum> newlist = [];
+    final deliveryPerPerson = deliveryAsInt / state.nameAndSum.length;
+
+    for (var element in list) {
+      newlist.add(
+        NameAndSum(
+          name: element.name,
+          bill: element.bill + deliveryPerPerson,
+        ),
+      );
+    }
+
+    emit(state.copyWith(
+      finalResult: newlist,
+      isResultReady: true,
+      isFullSoumMatchWithEachPersonTotal: true,
+    ));
+  }
+
+//! ---------------------------------------------------------------------------------------------------
+
   void getDB() {
     AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
 
@@ -80,138 +223,5 @@ class RootBloc extends Cubit<RootState> {
 
   void makeIsFullSoumMatchWithEachPersonTotal() {
     emit(state.copyWith(isFullSoumMatchWithEachPersonTotal: false));
-  }
-
-  void soumOfOrdersISNotEqualToFullAmount(double fullAmountMinusDelivery) {
-    final list = List<NameAndSum>.from(state.nameAndSum).toList();
-    List<NameAndSum> newlist = [];
-    //TODO add minus delivery
-
-    final howManyPeopleSelcted = state.selectedUsers.length;
-    double fullAmount = 0;
-
-    for (var element in list) {
-      fullAmount = fullAmount + element.bill;
-    }
-    bool isMatch = (fullAmount == fullAmountMinusDelivery);
-
-    emit(
-      state.copyWith(
-        isFullSoumMatchWithEachPersonTotal: isMatch,
-      ),
-    );
-  }
-
-  void calculate(
-    String fullAmount, {
-    String? discountPercent,
-    String? deliverySum,
-  }) {
-    //! Task turn all to int  - start
-    var fullAmountAsInt = double.parse(fullAmount);
-    var discountAsInt = 0.0;
-    var deliveryAsInt = 0.0;
-
-    if (discountPercent != null && discountPercent.isNotEmpty) {
-      discountAsInt = double.parse(discountPercent);
-    }
-
-    if (deliverySum != null && deliverySum.isNotEmpty) {
-      deliveryAsInt = double.parse(deliverySum);
-    }
-
-    //! Task turn all to int  - end
-
-    //! Discount & fullPrice - delivery  - start
-    var discount = 0.0;
-    if (discountAsInt != 0) {
-      if (discountAsInt > 99) {
-        discount = discountAsInt;
-      } else {
-        discount = discountAsInt / 100;
-      }
-    }
-
-    var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
-    var fullPlusDeliveryFee = fullAmountAsInt - deliveryAsInt;
-    //fullMinusDeliveryMinusPercentPercent
-    var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * discount);
-    var discountInSoums = fullMinusDeliveryFee - discountAsInt;
-
-    soumOfOrdersISNotEqualToFullAmount(fullMinusDeliveryFee);
-
-    //! Discount & fullPrice - delivery  - end
-
-    if (discount != 0 && discountAsInt > 99) {
-      calculatedDiscountInSOUMS(
-        fullAmountAsInt,
-        deliveryAsInt,
-        discountAsInt,
-      );
-    } else if (discount != 0) {
-      calculatedEachWithPercentDiscount(discount, deliveryAsInt);
-    } else {
-      calculatedWithoutDiscount(deliveryAsInt);
-    }
-  }
-
-  void calculatedDiscountInSOUMS(
-    double fullSum,
-    double delivery,
-    double discountInSoums,
-  ) {
-    final list = List<NameAndSum>.from(state.nameAndSum).toList();
-    List<NameAndSum> newlist = [];
-
-    final discountInSoumsForEachPerson = discountInSoums / list.length;
-    //work on delivery
-    final deliveryPerPerson = delivery / list.length;
-
-    for (var element in list) {
-      newlist.add(
-        NameAndSum(
-          name: element.name,
-          bill: element.bill - discountInSoumsForEachPerson + deliveryPerPerson,
-        ),
-      );
-    }
-
-    emit(state.copyWith(finalResult: newlist, isResultReady: true));
-  }
-  //TODO add obslujivaniye
-
-  void calculatedEachWithPercentDiscount(double discount, double delivery) {
-    final list = List<NameAndSum>.from(state.nameAndSum).toList();
-    List<NameAndSum> newlist = [];
-
-    final deliveryPerPerson = delivery / list.length;
-
-    for (var element in list) {
-      newlist.add(
-        NameAndSum(
-          name: element.name,
-          bill: element.bill - (element.bill * discount) + deliveryPerPerson,
-        ),
-      );
-    }
-
-    emit(state.copyWith(finalResult: newlist, isResultReady: true));
-  }
-
-  void calculatedWithoutDiscount(double deliveryAsInt) {
-    final list = List<NameAndSum>.from(state.nameAndSum).toList();
-    List<NameAndSum> newlist = [];
-    final deliveryPerPerson = deliveryAsInt / state.nameAndSum.length;
-
-    for (var element in list) {
-      newlist.add(
-        NameAndSum(
-          name: element.name,
-          bill: element.bill + deliveryPerPerson,
-        ),
-      );
-    }
-
-    emit(state.copyWith(finalResult: newlist, isResultReady: true));
   }
 }
