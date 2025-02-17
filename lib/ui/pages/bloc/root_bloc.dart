@@ -7,22 +7,6 @@ part 'root_state.dart';
 class RootBloc extends Cubit<RootState> {
   RootBloc() : super(RootState.initial());
 
-  void isFullSoumMatchWithEachPersonTotal(double fullAmountMinusDelivery) {
-    final list = List<NameAndSum>.from(state.nameAndSum).toList();
-    List<NameAndSum> newlist = [];
-    //TODO add minus delivery
-
-    final howManyPeopleSelcted = state.selectedUsers.length;
-    double fullAmount = 0;
-
-    for (var element in list) {
-      fullAmount = fullAmount + element.bill;
-    }
-    bool isMatch = (fullAmount == fullAmountMinusDelivery);
-
-    emit(state.copyWith(isFullSoumMatchWithEachPersonTotal: isMatch));
-  }
-
   void calculate(
     String fullAmount, {
     String? discountPercent,
@@ -54,26 +38,18 @@ class RootBloc extends Cubit<RootState> {
     }
 
     var fullMinusDeliveryFee = fullAmountAsInt - deliveryAsInt;
-    var fullPlusDeliveryFee = fullAmountAsInt - deliveryAsInt;
-    //fullMinusDeliveryMinusPercentPercent
-    var finalSum = fullMinusDeliveryFee - (fullMinusDeliveryFee * discount);
-    var discountInSoums = fullMinusDeliveryFee - discountAsInt;
-
-    isFullSoumMatchWithEachPersonTotal(fullMinusDeliveryFee);
 
     //! Discount & fullPrice - delivery  - end
-    if (state.isFullSoumMatchWithEachPersonTotal) {
-      if (discount != 0 && discountAsInt > 99) {
-        calculatedDiscountInSOUMS(
-          fullAmountAsInt,
-          deliveryAsInt,
-          discountAsInt,
-        );
-      } else if (discount != 0) {
-        calculatedEachWithPercentDiscount(discount, deliveryAsInt);
-      } else {
-        calculatedWithoutDiscount(deliveryAsInt);
-      }
+    if (discount != 0 && discountAsInt > 99) {
+      calculatedDiscountInSOUMS(
+        fullAmountAsInt,
+        deliveryAsInt,
+        discountAsInt,
+      );
+    } else if (discount != 0) {
+      calculatedEachWithPercentDiscount(discount, deliveryAsInt);
+    } else {
+      calculatedWithoutDiscount(deliveryAsInt);
     }
   }
 
@@ -101,7 +77,6 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(
       finalResult: newlist,
       isResultReady: true,
-      isFullSoumMatchWithEachPersonTotal: true,
     ));
   }
 
@@ -123,7 +98,6 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(
       finalResult: newlist,
       isResultReady: true,
-      isFullSoumMatchWithEachPersonTotal: true,
     ));
   }
 
@@ -144,7 +118,6 @@ class RootBloc extends Cubit<RootState> {
     emit(state.copyWith(
       finalResult: newlist,
       isResultReady: true,
-      isFullSoumMatchWithEachPersonTotal: true,
     ));
   }
 
@@ -222,6 +195,6 @@ class RootBloc extends Cubit<RootState> {
   }
 
   void makeIsFullSoumMatchWithEachPersonTotal() {
-    emit(state.copyWith(isFullSoumMatchWithEachPersonTotal: false));
+    emit(state.copyWith(isResultReady: false));
   }
 }
