@@ -68,7 +68,7 @@ class _HomeTabState extends State<HomeTab> {
                         },
                       ),
                       ExpenseNameAndAmount(
-                        expenseName: 'Delivery amount',
+                        expenseName: 'Other fees(as delivery. service...)',
                         fullAmount: deliveryAmount,
                       ),
                       if (state.selectedUsers.isNotEmpty)

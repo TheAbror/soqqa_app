@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:soqqa_app/widget_imports.dart';
 
 part 'root_state.dart';
@@ -12,7 +10,6 @@ class RootBloc extends Cubit<RootState> {
     String? discountPercent,
     String? deliverySum,
   }) {
-    //! Task turn all to int  - start
     var fullAmountAsInt = double.parse(fullAmount);
     var discountAsInt = 0.0;
     var deliveryAsInt = 0.0;
@@ -24,10 +21,17 @@ class RootBloc extends Cubit<RootState> {
     if (deliverySum != null && deliverySum.isNotEmpty) {
       deliveryAsInt = double.parse(deliverySum);
     }
-    //! Task turn all to int  - end
 
-    if (deliveryAsInt == 0 && deliveryAsInt == 0) {
-      calculateRestaurantCase(fullAmountAsInt);
+    double sumOfAllUserInputs = 0;
+    for (var element in state.nameAndSum) {
+      sumOfAllUserInputs = element.bill + sumOfAllUserInputs;
+    }
+
+    if (deliveryAsInt == 0 && discountAsInt == 0) {
+      calculateRestaurantCase(
+        fullAmountAsInt,
+        sumOfAllUserInputs,
+      );
     } else {
       // case to know whether discount is in % or soums
       var discount = 0.0;
@@ -52,24 +56,28 @@ class RootBloc extends Cubit<RootState> {
       }
       //write case when no discount but delivery fee
       else if (discount == 0 && deliveryAsInt != 0) {
-        noDiscountButDelivery(fullAmountAsInt, deliveryAsInt);
+        noDiscountButDelivery(
+          fullAmountAsInt,
+          deliveryAsInt,
+          sumOfAllUserInputs,
+        );
       } else {
         calculatedWithoutDiscount(deliveryAsInt);
       }
     }
   }
 
-  void noDiscountButDelivery(double fullAmountAsInt, double deliveryAsInt) {
+  void noDiscountButDelivery(
+    double fullAmountAsInt,
+    double deliveryAsInt,
+    double sumOfAllUserInputs,
+  ) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
     List<NameAndSum> newlist = [];
     final fullMinusDelivery = fullAmountAsInt - deliveryAsInt;
 
-    double fullOrderedGoodsPrice = 0;
-    for (var element in list) {
-      fullOrderedGoodsPrice = element.bill + fullOrderedGoodsPrice;
-    }
-    final leftoverPerPerson = (fullMinusDelivery - fullOrderedGoodsPrice) /
-        state.selectedUsers.length;
+    final leftoverPerPerson =
+        (fullMinusDelivery - sumOfAllUserInputs) / state.selectedUsers.length;
 
     final deliveryPerPerson = deliveryAsInt / state.selectedUsers.length;
 
@@ -89,20 +97,12 @@ class RootBloc extends Cubit<RootState> {
   }
 
   // write case when no discount & no delivery
-  calculateRestaurantCase(double fullAmout) {
+  calculateRestaurantCase(double fullAmout, double sumOfAllUserInputs) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
-
-    double sumOfAllORders = 0;
-
-    for (var element in list) {
-      sumOfAllORders = element.bill + sumOfAllORders;
-    }
-
-    debugPrint(sumOfAllORders.toString());
 
     List<NameAndSum> newlist = [];
 
-    double additionalSoumForService = fullAmout - sumOfAllORders;
+    double additionalSoumForService = fullAmout - sumOfAllUserInputs;
     double additionalServicePerPerson =
         additionalSoumForService / state.selectedUsers.length;
 
