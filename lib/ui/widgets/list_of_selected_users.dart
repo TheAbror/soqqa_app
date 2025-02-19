@@ -79,7 +79,6 @@ class _SingleUserDataState extends State<SingleUserData> {
                   widget.state.selectedUsers[widget.index],
                   double.parse(usersOrderAmount.text),
                 );
-            context.read<RootBloc>().makeIsReadyFalse();
           }
         },
       ),

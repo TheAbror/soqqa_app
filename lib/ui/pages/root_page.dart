@@ -14,7 +14,9 @@ class _RootPageState extends State<RootPage> {
       create: (context) => RootBloc()..getDB(),
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
+        resizeToAvoidBottomInset: false,
         body: SafeArea(child: HomeTab()),
+        // body: SafeArea(child: TestTab()),
       ),
     );
   }
@@ -38,8 +40,8 @@ class _HomeTabState extends State<HomeTab> {
     return BlocConsumer<RootBloc, RootState>(
       listener: (context, state) async {
         if (state.isResultReady) {
-          if (!context.mounted) return;
           resultDialog(context, state);
+          context.read<RootBloc>().makeIsReadyFalse();
         }
       },
       builder: (context, state) {
@@ -112,6 +114,8 @@ class Buttons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
+
     return Positioned(
       bottom: 0.h,
       left: 8.w,
@@ -125,7 +129,7 @@ class Buttons extends StatelessWidget {
               final result = await PrimaryBottomSheet.show(
                 context,
                 selectedValues: state.selectedUsers,
-                initialList: state.allUsers,
+                initialList: savedUsers?.allUsers ?? [],
               );
 
               if (result != null && result.isNotEmpty) {

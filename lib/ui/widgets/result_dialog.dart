@@ -77,8 +77,9 @@ Future<dynamic> resultDialog(BuildContext context, RootState state) {
                                 style: TextStyle(fontSize: 14.sp),
                               ),
                               Text(
-                                '${e.bill} soums',
+                                '${e.bill.toStringAsFixed(2)} soums',
                                 style: TextStyle(fontSize: 14.sp),
+                                maxLines: 1,
                               ),
                             ],
                           ),

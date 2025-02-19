@@ -27,6 +27,8 @@ class RootBloc extends Cubit<RootState> {
       sumOfAllUserInputs = element.bill + sumOfAllUserInputs;
     }
 
+    double sumMinusFull = fullAmountAsInt - sumOfAllUserInputs;
+
     if (deliveryAsInt == 0 && discountAsInt == 0) {
       calculateRestaurantCase(
         fullAmountAsInt,
@@ -45,14 +47,20 @@ class RootBloc extends Cubit<RootState> {
 
       //main logic division
 
-      if (discount != 0 && discountAsInt > 99) {
+      if (discount != 0 && discountAsInt > 99 && discountAsInt != 0) {
         calculatedDiscountInSOUMS(
           fullAmountAsInt,
           deliveryAsInt,
           discountAsInt,
+          sumMinusFull,
         );
       } else if (discount != 0) {
-        calculatedEachWithPercentDiscount(discount, deliveryAsInt);
+        calculatedEachWithPercentDiscount(
+          discount,
+          deliveryAsInt,
+          fullAmountAsInt,
+          sumOfAllUserInputs,
+        );
       }
       //write case when no discount but delivery fee
       else if (discount == 0 && deliveryAsInt != 0) {
@@ -60,6 +68,7 @@ class RootBloc extends Cubit<RootState> {
           fullAmountAsInt,
           deliveryAsInt,
           sumOfAllUserInputs,
+          sumMinusFull,
         );
       } else {
         calculatedWithoutDiscount(deliveryAsInt);
@@ -71,21 +80,20 @@ class RootBloc extends Cubit<RootState> {
     double fullAmountAsInt,
     double deliveryAsInt,
     double sumOfAllUserInputs,
+    double sumMinusFull,
   ) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
     List<NameAndSum> newlist = [];
-    final fullMinusDelivery = fullAmountAsInt - deliveryAsInt;
 
-    final leftoverPerPerson =
-        (fullMinusDelivery - sumOfAllUserInputs) / state.selectedUsers.length;
-
-    final deliveryPerPerson = deliveryAsInt / state.selectedUsers.length;
+    var peopleCount = state.nameAndSum.length;
+    final deliveryPerPerson =
+        (deliveryAsInt / peopleCount) + (sumMinusFull / peopleCount);
 
     for (var element in list) {
       newlist.add(
         NameAndSum(
           name: element.name,
-          bill: element.bill + deliveryPerPerson + leftoverPerPerson,
+          bill: element.bill + deliveryPerPerson,
         ),
       );
     }
@@ -126,11 +134,12 @@ class RootBloc extends Cubit<RootState> {
     double fullSum,
     double delivery,
     double discountInSoums,
+    double sumMinusFull,
   ) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
     List<NameAndSum> newlist = [];
 
-    final discountInSoumsForEachPerson = discountInSoums / list.length;
+    final additionalPerPerson = (sumMinusFull - discountInSoums) / list.length;
     //work on delivery
     final deliveryPerPerson = delivery / list.length;
 
@@ -138,7 +147,7 @@ class RootBloc extends Cubit<RootState> {
       newlist.add(
         NameAndSum(
           name: element.name,
-          bill: element.bill - discountInSoumsForEachPerson + deliveryPerPerson,
+          bill: element.bill + additionalPerPerson + deliveryPerPerson,
         ),
       );
     }
@@ -151,9 +160,16 @@ class RootBloc extends Cubit<RootState> {
 
   //example: At the beginning Uzum used to give 30% off for the first order
 
-  void calculatedEachWithPercentDiscount(double discount, double delivery) {
+  void calculatedEachWithPercentDiscount(
+    double discount,
+    double delivery,
+    double fullAmount,
+    double sumMinusFull,
+  ) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
     List<NameAndSum> newlist = [];
+    final leftOver =
+        ((fullAmount - fullAmount * discount) - sumMinusFull) / list.length;
 
     final deliveryPerPerson = delivery / list.length;
 
@@ -161,7 +177,7 @@ class RootBloc extends Cubit<RootState> {
       newlist.add(
         NameAndSum(
           name: element.name,
-          bill: element.bill - (element.bill * discount) + deliveryPerPerson,
+          bill: element.bill + leftOver + deliveryPerPerson,
         ),
       );
     }
@@ -173,7 +189,6 @@ class RootBloc extends Cubit<RootState> {
   }
 
   //self explanatory
-
   void calculatedWithoutDiscount(double deliveryAsInt) {
     final list = List<NameAndSum>.from(state.nameAndSum).toList();
     List<NameAndSum> newlist = [];
@@ -201,25 +216,29 @@ class RootBloc extends Cubit<RootState> {
 
     var db = List<String>.from(state.allUsers);
 
-    db = savedUsers!.allUsers;
+    db = savedUsers?.allUsers ?? [];
 
     emit(state.copyWith(allUsers: db));
   }
 
   void addNewUser(String user) {
     AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
+    // ignore: prefer_conditional_assignment
+    var db = savedUsers?.allUsers;
+    if (savedUsers?.allUsers == null) {
+      savedUsers?.allUsers = [];
+      db = [];
+    }
 
-    if (savedUsers != null) {
-      if (!savedUsers.allUsers.contains(user)) {
-        savedUsers.allUsers.add(user);
+    if (!(db ?? []).contains(user)) {
+      db?.add(user);
 
-        emit(state.copyWith(allUsers: savedUsers.allUsers));
+      emit(state.copyWith(allUsers: db));
 
-        boxAllUsers.put(
-          ShPrefKeys.allUsers,
-          AllUsers(allUsers: savedUsers.allUsers),
-        );
-      }
+      boxAllUsers.put(
+        ShPrefKeys.allUsers,
+        AllUsers(allUsers: db ?? []),
+      );
     }
   }
 
@@ -245,6 +264,7 @@ class RootBloc extends Cubit<RootState> {
     list[index] = NameAndSum(name: name, bill: howMuchWasOrder);
 
     emit(state.copyWith(nameAndSum: list));
+    makeIsReadyFalse();
   }
 
   void removeUser(int index) {

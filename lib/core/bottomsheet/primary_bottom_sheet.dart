@@ -1,9 +1,7 @@
 import 'package:soqqa_app/widget_imports.dart';
 
 class PrimaryBottomSheet extends StatelessWidget {
-  const PrimaryBottomSheet({
-    super.key,
-  });
+  const PrimaryBottomSheet({super.key});
 
   static Future<List<String>?> show(
     BuildContext parentContext, {
