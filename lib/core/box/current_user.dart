@@ -31,9 +31,9 @@ class CurrentUser {
 @HiveType(typeId: 2)
 class AllUsers {
   AllUsers({
-    required this.allUsers,
+    this.allUsers,
   });
 
-  @HiveField(5)
-  List<String> allUsers;
+  @HiveField(5, defaultValue: [])
+  List<String>? allUsers;
 }

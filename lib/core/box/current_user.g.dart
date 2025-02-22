@@ -63,7 +63,7 @@ class AllUsersAdapter extends TypeAdapter<AllUsers> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return AllUsers(
-      allUsers: (fields[5] as List).cast<String>(),
+      allUsers: fields[5] == null ? [] : (fields[5] as List?)?.cast<String>(),
     );
   }
 

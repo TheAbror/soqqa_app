@@ -84,7 +84,6 @@ class _HomeTabState extends State<HomeTab> {
                     child: Text('No users selected'),
                   ),
                 Buttons(
-                  state: state,
                   fullAmount: fullAmount,
                   discountPercent: discountPercent,
                   deliveryAmount: deliveryAmount,
@@ -99,14 +98,12 @@ class _HomeTabState extends State<HomeTab> {
 }
 
 class Buttons extends StatelessWidget {
-  final RootState state;
   final TextEditingController fullAmount;
   final TextEditingController discountPercent;
   final TextEditingController deliveryAmount;
 
   const Buttons({
     super.key,
-    required this.state,
     required this.fullAmount,
     required this.discountPercent,
     required this.deliveryAmount,
@@ -114,51 +111,53 @@ class Buttons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
-
     return Positioned(
       bottom: 0.h,
       left: 8.w,
       right: 8.w,
-      child: Column(
-        children: [
-          ActionButton(
-            isFilled: false,
-            text: 'Choose users',
-            onPressed: () async {
-              final result = await PrimaryBottomSheet.show(
-                context,
-                selectedValues: state.selectedUsers,
-                initialList: savedUsers?.allUsers ?? [],
-              );
+      child: BlocBuilder<RootBloc, RootState>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              ActionButton(
+                isFilled: false,
+                text: 'Choose users',
+                onPressed: () async {
+                  final result = await PrimaryBottomSheet.show(
+                    context,
+                    selectedValues: state.selectedUsers,
+                    initialList: state.allUsers,
+                  );
 
-              if (result != null && result.isNotEmpty) {
-                if (!context.mounted) return;
-                context.read<RootBloc>().addMultipleUsers(result);
-              }
-            },
-          ),
-          SizedBox(height: 20.h),
-          ActionButton(
-            text: 'Calculate',
-            onPressed: () {
-              if (state.selectedUsers.isNotEmpty) {
-                final fullOrderAmount = fullAmount.text;
-                final discountPercentage = discountPercent.text;
-                final deliverySum = deliveryAmount.text;
+                  if (result != null && result.isNotEmpty) {
+                    if (!context.mounted) return;
+                    context.read<RootBloc>().addMultipleUsers(result);
+                  }
+                },
+              ),
+              SizedBox(height: 20.h),
+              ActionButton(
+                text: 'Calculate',
+                onPressed: () {
+                  if (state.selectedUsers.isNotEmpty) {
+                    final fullOrderAmount = fullAmount.text;
+                    final discountPercentage = discountPercent.text;
+                    final deliverySum = deliveryAmount.text;
 
-                context.read<RootBloc>().calculate(
-                      fullOrderAmount,
-                      discountPercent: discountPercentage,
-                      deliverySum: deliverySum,
-                    );
-              } else {
-                showMessage('No-one selcted yet', isError: true);
-              }
-            },
-          ),
-          SizedBox(height: 10.h),
-        ],
+                    context.read<RootBloc>().calculate(
+                          fullOrderAmount,
+                          discountPercent: discountPercentage,
+                          deliverySum: deliverySum,
+                        );
+                  } else {
+                    showMessage('No-one selcted yet', isError: true);
+                  }
+                },
+              ),
+              SizedBox(height: 10.h),
+            ],
+          );
+        },
       ),
     );
   }

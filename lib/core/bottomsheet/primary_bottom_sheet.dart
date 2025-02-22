@@ -130,6 +130,21 @@ class _BodyState extends State<_Body> {
                 },
               ),
             ),
+            GestureDetector(
+              onTap: () {
+                context.read<RootBloc>().clearDB();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Clear all'),
+                  Icon(
+                    IconsaxPlusLinear.user_remove,
+                    color: AppColors.primary,
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 8.w,
