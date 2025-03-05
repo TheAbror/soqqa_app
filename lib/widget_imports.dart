@@ -1,6 +1,5 @@
 export 'package:flutter/material.dart';
 export 'package:flutter_screenutil/flutter_screenutil.dart';
-export 'package:soqqa_app/core/db/preferences_services.dart';
 export 'package:equatable/equatable.dart';
 export 'package:soqqa_app/core/bloc_progress/bloc_progress.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';

@@ -214,18 +214,13 @@ class RootBloc extends Cubit<RootState> {
   void getDB() async {
     AllUsers? savedUsers = boxAllUsers.get(ShPrefKeys.allUsers);
 
-    if (savedUsers?.allUsers == null) {
-      await boxAllUsers.put(
-        ShPrefKeys.allUsers,
-        AllUsers(allUsers: []),
-      );
-    }
-
     var db = List<String>.from(state.allUsers);
 
     db = savedUsers?.allUsers ?? [];
 
-    emit(state.copyWith(allUsers: db));
+    if (savedUsers?.allUsers != null) {
+      emit(state.copyWith(allUsers: db));
+    }
   }
 
   void addNewUser(String user) {
@@ -240,7 +235,10 @@ class RootBloc extends Cubit<RootState> {
     if (!(db ?? []).contains(user)) {
       db?.add(user);
 
+      debugPrint(state.allUsers.toString());
+
       emit(state.copyWith(allUsers: db));
+      debugPrint(state.allUsers.toString());
 
       boxAllUsers.put(
         ShPrefKeys.allUsers,
@@ -296,19 +294,5 @@ class RootBloc extends Cubit<RootState> {
 
   void makeIsFullSoumMatchWithEachPersonTotal() {
     emit(state.copyWith(isResultReady: false));
-  }
-
-  void clearDB() {
-    emit(state.copyWith(
-      allUsers: [],
-      selectedUsers: [],
-      nameAndSum: [],
-      finalResult: [],
-    ));
-
-    boxAllUsers.put(
-      ShPrefKeys.allUsers,
-      AllUsers(allUsers: []),
-    );
   }
 }

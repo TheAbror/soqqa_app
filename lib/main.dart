@@ -3,14 +3,10 @@ import 'package:soqqa_app/widget_imports.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await PreferencesServices.init();
-
   await Hive.initFlutter();
 
-  Hive.registerAdapter(CurrentUserAdapter());
   Hive.registerAdapter(AllUsersAdapter());
 
-  boxCurrentUser = await Hive.openBox<CurrentUser>(ShPrefKeys.currentUser);
   boxAllUsers = await Hive.openBox<AllUsers>(ShPrefKeys.allUsers);
 
   setUpLogging();

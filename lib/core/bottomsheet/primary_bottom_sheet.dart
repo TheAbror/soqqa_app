@@ -44,7 +44,7 @@ class PrimaryBottomSheet extends StatelessWidget {
           action: () {
             Navigator.pop(context, state.selectedUsers);
           },
-          child: _Body(),
+          child: _Body(initialList: state.initialList),
         );
       },
     );
@@ -52,6 +52,10 @@ class PrimaryBottomSheet extends StatelessWidget {
 }
 
 class _Body extends StatefulWidget {
+  final List<String> initialList;
+
+  const _Body({required this.initialList});
+
   @override
   State<_Body> createState() => _BodyState();
 }
@@ -70,81 +74,69 @@ class _BodyState extends State<_Body> {
             ),
 
             Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.symmetric(
-                  vertical: 10.h,
-                  horizontal: 8.w,
-                ),
-                physics: const BouncingScrollPhysics(),
-                itemCount: state.initialList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final item = state.initialList[index];
-
-                  final isSelected = state.selectedUsers.contains(item);
-
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      context
-                          .read<BottomSheetDataBloc>()
-                          .selectUsersToStartCalculations(item);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 4.h),
-                      padding: EdgeInsets.symmetric(vertical: 4.h),
-                      child: Row(
-                        children: [
-                          CustomCheckbox(
-                            isAttended: isSelected,
-                            onChanged: () {
-                              context
-                                  .read<BottomSheetDataBloc>()
-                                  .selectUsersToStartCalculations(item);
-                            },
-                          ),
-                          SizedBox(width: 8.w),
-                          Text(
-                            item,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              context
-                                  .read<BottomSheetDataBloc>()
-                                  .removeUser(index);
-                            },
-                            child: Icon(
-                              IconsaxPlusLinear.user_remove,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
+              child: widget.initialList.isEmpty
+                  ? Center(child: Text('No results'))
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10.h,
+                        horizontal: 8.w,
                       ),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: state.initialList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final item = state.initialList[index];
+
+                        final isSelected = state.selectedUsers.contains(item);
+
+                        return GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            context
+                                .read<BottomSheetDataBloc>()
+                                .selectUsersToStartCalculations(item);
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 4.h),
+                            padding: EdgeInsets.symmetric(vertical: 4.h),
+                            child: Row(
+                              children: [
+                                CustomCheckbox(
+                                  isAttended: isSelected,
+                                  onChanged: () {
+                                    context
+                                        .read<BottomSheetDataBloc>()
+                                        .selectUsersToStartCalculations(item);
+                                  },
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  item,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Spacer(),
+                                GestureDetector(
+                                  onTap: () {
+                                    context
+                                        .read<BottomSheetDataBloc>()
+                                        .removeUser(index);
+                                  },
+                                  child: Icon(
+                                    IconsaxPlusLinear.user_remove,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
-            GestureDetector(
-              onTap: () {
-                context.read<RootBloc>().clearDB();
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Clear all'),
-                  Icon(
-                    IconsaxPlusLinear.user_remove,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ),
+
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 8.w,
