@@ -19,7 +19,10 @@ class MyField extends StatelessWidget {
         onChanged: onChanged,
         controller: controller,
         textInputAction: TextInputAction.next,
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(signed: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+        ],
         decoration: InputDecoration(
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.primary),
