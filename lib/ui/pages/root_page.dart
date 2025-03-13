@@ -64,7 +64,6 @@ class _HomeTabState extends State<HomeTab> {
                         fullAmount: discountPercent,
                         tooltipkey: tooltipkey,
                         onTap: () {
-                          // Show Tooltip programmatically on button tap.
                           tooltipkey.currentState?.ensureTooltipVisible();
                         },
                       ),
